@@ -1,0 +1,238 @@
+@use '@angular/material' as mat;
+
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+@include mat.core();
+
+/* Modern CSS reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+
+$my-primary: mat.define-palette(mat.$indigo-palette, 500);
+$my-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$my-warn: mat.define-palette(mat.$red-palette);
+
+$my-theme: mat.define-light-theme((
+  color: (
+    primary: $my-primary,
+    accent: $my-accent,
+    warn: $my-warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+@include mat.all-component-themes($my-theme);
+
+html, body {
+  height: 100%;
+  overflow: hidden; /* Voorkom dat het lichaam zelf scrollt, scroll alleen binnen de mat-sidenav-content */
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f5f5f5;
+}
+
+.mat-card {
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+
+
+
+
+
+
+/* Custom Notifications */
+.success-snackbar {
+  background: #4CAF50;
+  color: white;
+}
+
+.error-snackbar {
+  background: #F44336;
+  color: white;
+}
+
+.info-snackbar {
+  background: #2196F3;
+  color: white;
+}
+
+
+/* Toast Notifications */
+/* Globale stijl voor ngx-toastr notificaties */
+.toast-container {
+  /* Plaats de container waar je wilt dat het verschijnt */
+  top: 10px;
+  right: 10px;  /* Voor rechteronderhoek */
+
+  /* Voeg extra styling toe indien nodig */
+  z-index: 9999; /* Zorg ervoor dat de toast boven andere elementen verschijnt */
+}
+//
+//.toast {
+//  /* Basis styling voor toast meldingen */
+//  display: flex;
+//  align-items: center;
+//  padding: 15px;
+//  margin-bottom: 10px;
+//  border-radius: 5px;
+//  color: #fff;
+//  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Toevoegen van een schaduw */
+//  font-family: Arial, sans-serif; /* Voor betere leesbaarheid */
+//}
+
+/* Stijl voor ngx-toastr notificaties */
+.toast {
+  /* Basis styling voor toast meldingen */
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Toevoegen van een schaduw */
+  font-family: Arial, sans-serif; /* Voor betere leesbaarheid */
+}
+
+//#toast-container > div {
+//  display: flex;
+//  align-items: center;
+//  padding: 15px;
+//  margin-bottom: 10px;
+//  border-radius: 5px;
+//  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+//  font-family: Arial, sans-serif; /* Voor betere leesbaarheid */
+//}
+
+.toast-success {
+  background-color: #28a745 !important;
+  color: #fff !important;
+}
+
+.toast-error {
+  background-color: #dc3545 !important;
+  color: #fff !important;
+}
+
+.toast-info {
+  background-color: #17a2b8 !important;
+  color: #fff !important;
+}
+
+.toast-warning {
+  background-color: #ffc107 !important;
+  color: #fff !important;
+}
+
+#toast-container > div .toast-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+#toast-container > div .toast-message {
+  margin: 0;
+}
+
+#toast-container > div .toast-icon {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+.toast-success .toast-icon::before {
+  content: '✔';
+}
+
+.toast-error .toast-icon::before {
+  content: '❌';
+}
+
+.toast-info .toast-icon::before {
+  content: 'ℹ';
+}
+
+.toast-warning .toast-icon::before {
+  content: '⚠';
+}
+
+
+
+
+/* Inhoud van pagina's */
+
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.mat-sidenav-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 20px; /* Voeg wat ruimte toe aan de onderkant */
+}
+
+/* Zorg ervoor dat form fields de volledige breedte innemen */
+.mat-form-field {
+  width: 100%;
+}
+
+/* Zorg voor wat ruimte tussen form fields */
+.mat-form-field + .mat-form-field {
+  margin-top: 10px;
+}
+
+/* Maak knoppen breder op mobile */
+@media (max-width: 767px) {
+  .mat-raised-button, .mat-button {
+    width: 100%;
+    margin-top: 10px;
+  }
+}
+
+
+/**
+* FullCalendar Mobile Styles
+ */
+@media (max-width: 768px) {
+  .fc {
+    .fc-toolbar-title {
+      font-size: 1.2em;
+    }
+    .fc-button {
+      padding: 0.3em 0.5em;
+      font-size: 0.9em;
+    }
+    .fc-day-header {
+      font-size: 0.9em;
+    }
+    .fc-event {
+      font-size: 0.8em;
+    }
+  }
+}
