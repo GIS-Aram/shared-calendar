@@ -6,7 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notificatie.service';
 import {MatIconModule} from "@angular/material/icon";
-import {MatSidenav} from "@angular/material/sidenav";
+import {MatDialog} from "@angular/material/dialog";
+import {LogoutConfirmationDialogComponent} from "../logout-confirmation-dialog/logout-confirmation-dialog.component";
 
 @Component({
   selector: 'app-header',
@@ -150,12 +151,24 @@ export class HeaderComponent {
   constructor(
     public authService: AuthService,
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private dialog: MatDialog
   ) {}
 
   logout() {
-    this.authService.logout();
-    this.notificationService.showInfo('U bent uitgelogd', '');
-    this.router.navigate(['/login']);
+    // this.authService.logout();
+    // this.notificationService.showInfo('U bent uitgelogd', '');
+    // this.router.navigate(['/login']);
+
+
+    const dialogRef = this.dialog.open(LogoutConfirmationDialogComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.authService.logout();
+        this.notificationService.showInfo('U bent uitgelogd', '');
+        this.router.navigate(['/login']);
+      }
+    });
   }
 }

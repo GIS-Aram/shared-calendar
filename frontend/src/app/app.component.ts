@@ -9,6 +9,10 @@ import { MatIconModule } from '@angular/material/icon';
 import {HeaderComponent} from "./components/header/header.component";
 import {AuthService} from "./services/auth.service";
 import {NotificationService} from "./services/notificatie.service";
+import {MatDialog} from "@angular/material/dialog";
+import {
+  LogoutConfirmationDialogComponent
+} from "./components/logout-confirmation-dialog/logout-confirmation-dialog.component";
 
 @Component({
   selector: 'app-root',
@@ -160,15 +164,28 @@ export class AppComponent implements OnInit {
 
   constructor(public authService: AuthService,
               public notificationService: NotificationService,
-              public router: Router) {}
+              public router: Router,
+              private dialog: MatDialog) {}
 
   ngOnInit() {
     this.authService['checkTokenExpiration']();
   }
 
   logout() {
-    this.authService.logout();
-    this.notificationService.showInfo('U bent uitgelogd', '');
-    this.router.navigate(['/login']);
+    // this.authService.logout();
+    // this.notificationService.showInfo('U bent uitgelogd', '');
+    // this.router.navigate(['/login']);
+
+
+    const dialogRef = this.dialog.open(LogoutConfirmationDialogComponent);
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.authService.logout();
+        this.notificationService.showInfo('U bent uitgelogd', '');
+        this.router.navigate(['/login']);
+        this.sidenav.close();
+      }
+    });
   }
 }
