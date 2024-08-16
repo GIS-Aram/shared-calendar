@@ -42,15 +42,15 @@ jobs:
 #          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-#      - name: Deploy to GitHub Pages # dit is de nieuwe manier
-#        uses: peaceiris/actions-gh-pages@v4
-#        with:
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          publish_dir: ./frontend/dist/frontend/browser
+      - name: Deploy to GitHub Pages # dit is de nieuwe manier
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/dist/frontend/browser
 
-      - name: Deploy to GitHub Pages
-        run: npm run deploy
-        working-directory: ./frontend
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Deploy to GitHub Pages
+#        run: npm run deploy
+#        working-directory: ./frontend
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
