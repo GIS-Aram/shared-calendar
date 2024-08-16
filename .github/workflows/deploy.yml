@@ -26,6 +26,11 @@ jobs:
         run: npm run build -- --configuration=production --output-path=dist/frontend
         working-directory: ./frontend
 
+      - name: Configure Git
+        run: |
+          git config --global user.email "dev.arammousa@gmail.com"
+          git config --global user.name "GIS-Aram"  
+
       - name: Deploy to GitHub Pages
         run: npx angular-cli-ghpages --dir=dist/frontend/browser --no-silent
         working-directory: ./frontend
