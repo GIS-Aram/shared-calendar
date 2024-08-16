@@ -35,8 +35,15 @@ jobs:
         run: ls -alh dist/frontend/browser
         working-directory: ./frontend
 
+#      - name: Deploy to GitHub Pages
+#        run: npx angular-cli-ghpages --dir=dist/frontend/browser --no-silent
+#        working-directory: ./frontend
+#        env:
+#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
       - name: Deploy to GitHub Pages
-        run: npx angular-cli-ghpages --dir=dist/frontend/browser --no-silent --force
-        working-directory: ./frontend
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/dist/frontend/browser
