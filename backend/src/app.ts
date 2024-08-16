@@ -14,16 +14,16 @@ const PORT = process.env.PORT || 3000;
 
 connectDB();
 
-const ORIGIN =  'https://gis-aram.github.io/shared-calendar'; // 'http://localhost:4200' ||
+// const ORIGIN =  'http://localhost:4200' || 'https://gis-aram.github.io/shared-calendar';
+//
+// const corsOptions = {
+//     origin: ORIGIN, // de URL van je frontend die je wilt toestaan
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'], // geef de HTTP-methoden op die je wilt toestaan
+//     allowedHeaders: ['Content-Type', 'Authorization'], // geef de headers op die je wilt toestaan
+//     credentials: true // stel dit in als je cookies of andere referenties wilt toestaan
+// };
 
-const corsOptions = {
-    origin: ORIGIN, // de URL van je frontend die je wilt toestaan
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // geef de HTTP-methoden op die je wilt toestaan
-    allowedHeaders: ['Content-Type', 'Authorization'], // geef de headers op die je wilt toestaan
-    credentials: true // stel dit in als je cookies of andere referenties wilt toestaan
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 app.use('/api/users', userRoutes);
