@@ -1,10 +1,11 @@
 {
   "name": "frontend",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "homepage": "https://gis-aram.github.io/shared-calendar-frontend/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration=production --output-path=dist/frontend",
+    "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "deploy": "gh-pages -d dist/frontend/browser"
