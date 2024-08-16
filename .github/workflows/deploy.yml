@@ -36,7 +36,7 @@ jobs:
         working-directory: ./frontend
 
       - name: Deploy to GitHub Pages
-        run: npx angular-cli-ghpages --dir=dist/frontend/browser --no-silent
+        run: npx angular-cli-ghpages --dir=dist/frontend/browser
         working-directory: ./frontend
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
