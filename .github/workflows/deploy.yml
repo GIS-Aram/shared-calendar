@@ -35,7 +35,7 @@ jobs:
         run: ls -alh dist/frontend/browser
         working-directory: ./frontend
 
-#      - name: Deploy to GitHub Pages
+#      - name: Deploy to GitHub Pages  # dit is de oude manier
 #        run: npx angular-cli-ghpages --dir=dist/frontend/browser --no-silent
 #        working-directory: ./frontend
 #        env:
