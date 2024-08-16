@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "version": "1.0.0",
-  "homepage": "https://gis-aram.github.io/shared-calendar-frontend/",
+  "homepage": "https://gis-aram.github.io/shared-calendar/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

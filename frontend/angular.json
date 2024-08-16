@@ -20,7 +20,7 @@
                   }
                 ],
                 "outputHashing": "all",
-                "baseHref": "/shared-calendar-frontend/"
+                "baseHref": "/shared-calendar/"
               }
             }
           }
@@ -34,7 +34,7 @@
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist/frontend",
-            "baseHref": "/shared-calendar-frontend/",
+            "baseHref": "/shared-calendar/",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -71,7 +71,7 @@
                 }
               ],
               "outputHashing": "all",
-              "baseHref": "/shared-calendar-frontend/"
+              "baseHref": "/shared-calendar/"
             },
             "development": {
               "optimization": false,
