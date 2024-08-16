@@ -29,13 +29,13 @@ jobs:
         run: npm run build
         working-directory: frontend
 
-      - name: Install backend dependencies
-        run: npm install
-        working-directory: backend
-
-      - name: Build backend
-        run: npm run build
-        working-directory: backend
+#      - name: Install backend dependencies
+#        run: npm install
+#        working-directory: backend
+#
+#      - name: Build backend
+#        run: npm run build
+#        working-directory: backend
 
       - name: Deploy to Vercel
         run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
