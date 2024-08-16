@@ -7,14 +7,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import {NotificationService} from "../../services/notificatie.service";
+import {TranslateModule} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-partner-invite',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, TranslateModule],
   template: `
     <div class="invite-form">
-      <h2>Invite Partner</h2>
+      <h2>{{ 'INVITE_PARTNER' | translate }}</h2>
       <form (ngSubmit)="onSubmit()">
         <mat-form-field>
           <input matInput placeholder="Partner's email" [(ngModel)]="partnerEmail" name="partnerEmail" required>

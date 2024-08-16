@@ -13,6 +13,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {
   LogoutConfirmationDialogComponent
 } from "./components/logout-confirmation-dialog/logout-confirmation-dialog.component";
+import { TranslateModule, TranslateService} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-root',
@@ -27,7 +28,8 @@ import {
     MatSidenavModule,
     MatListModule,
     MatIconModule,
-    HeaderComponent
+    HeaderComponent,
+    TranslateModule
   ],
 //   template: `
 // <app-header (menuToggle)="sidenav.toggle()"></app-header>
@@ -119,12 +121,12 @@ import {
       <mat-sidenav-container>
         <mat-sidenav #sidenav mode="over">
           <mat-nav-list>
-            <a *ngIf="!authService.isLoggedIn()" mat-list-item routerLink="/login" routerLinkActive="active">Login</a>
-            <a *ngIf="!authService.isLoggedIn()" mat-list-item routerLink="/register" routerLinkActive="active">Register</a>
-            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/calendar" routerLinkActive="active">Calendar</a>
-            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/appointments" routerLinkActive="active">Appointments</a>
-            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/invite-partner" routerLinkActive="active">Invite Partner</a>
-            <a *ngIf="authService.isLoggedIn()" mat-list-item (click)="logout()" routerLinkActive="active">Logout</a>
+            <a *ngIf="!authService.isLoggedIn()" mat-list-item routerLink="/login" routerLinkActive="active">{{ 'LOGIN' | translate }}</a>
+            <a *ngIf="!authService.isLoggedIn()" mat-list-item routerLink="/register" routerLinkActive="active">{{ 'REGISTER' | translate }}</a>
+            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/calendar" routerLinkActive="active">{{ 'CALENDAR' | translate }}</a>
+            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/appointments" routerLinkActive="active">{{ 'APPOINTMENTS' | translate }}</a>
+            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/invite-partner" routerLinkActive="active">{{ 'INVITE_PARTNER' | translate }}</a>
+            <a *ngIf="authService.isLoggedIn()" mat-list-item (click)="logout()" routerLinkActive="active">{{ 'LOGOUT' | translate }}</a>
           </mat-nav-list>
         </mat-sidenav>
         <mat-sidenav-content>
@@ -165,7 +167,12 @@ export class AppComponent implements OnInit {
   constructor(public authService: AuthService,
               public notificationService: NotificationService,
               public router: Router,
-              private dialog: MatDialog) {}
+              private dialog: MatDialog,
+              private translate: TranslateService) {
+    // Stel de standaardtaal in
+    this.translate.setDefaultLang('nl');
+    this.translate.use('nl'); // Gebruik standaard NL, kan later veranderd worden
+  }
 
   ngOnInit() {
     this.authService['checkTokenExpiration']();

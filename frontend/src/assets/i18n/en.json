@@ -1,0 +1,9 @@
+{
+  "LOGIN": "Login",
+  "REGISTER": "Register",
+  "CALENDAR": "Calendar",
+  "APPOINTMENTS": "Appointments",
+  "INVITE_PARTNER": "Invite Partner",
+  "LOGOUT": "Logout",
+  "APP_TITLE": "Shared Calendar App"
+}
