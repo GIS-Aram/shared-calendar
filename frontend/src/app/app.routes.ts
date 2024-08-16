@@ -9,7 +9,6 @@ import {AuthGuard} from "./guards/auth.guard";
 import {AcceptInvitationComponent} from "./components/accept-invitation/accept-invitation.component";
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'calendar', component: CalendarComponent, canActivate: [AuthGuard] },
   { path: 'appointments', component: AppointmentListComponent, canActivate: [AuthGuard] },
   { path: 'appointment/new', component: AppointmentFormComponent, canActivate: [AuthGuard] },
@@ -18,5 +17,5 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'invite-partner', component: PartnerInviteComponent, canActivate: [AuthGuard] },
   { path: 'accept-invitation/:token', component: AcceptInvitationComponent },
-
+  { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];

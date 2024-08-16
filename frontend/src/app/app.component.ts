@@ -176,6 +176,12 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.authService['checkTokenExpiration']();
+
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/calendar']);
+    } else {
+      this.router.navigate(['/login']);
+    }
   }
 
   logout() {
