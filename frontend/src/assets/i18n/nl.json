@@ -5,5 +5,10 @@
   "APPOINTMENTS": "Afspraken",
   "INVITE_PARTNER": "Partner Uitnodigen",
   "LOGOUT": "Uitloggen",
-  "APP_TITLE": "Gedeelde Kalender App"
+  "APP_TITLE": "Gedeelde Kalender App",
+  "WELCOME": "Welkom",
+  "EMAIL": "E-mail",
+  "PASSWORD": "Wachtwoord",
+  "CONFIRM_PASSWORD": "Bevestig Wachtwoord",
+  "INVITE": "Uitnodigen"
 }

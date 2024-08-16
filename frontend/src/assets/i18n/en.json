@@ -5,5 +5,10 @@
   "APPOINTMENTS": "Appointments",
   "INVITE_PARTNER": "Invite Partner",
   "LOGOUT": "Logout",
-  "APP_TITLE": "Shared Calendar App"
+  "APP_TITLE": "Shared Calendar App",
+  "WELCOME": "Welcome",
+  "EMAIL": "Email",
+  "PASSWORD": "Password",
+  "CONFIRM_PASSWORD": "Confirm Password",
+  "INVITE": "Invite"
 }

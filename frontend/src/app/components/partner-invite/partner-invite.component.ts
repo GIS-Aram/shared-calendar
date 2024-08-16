@@ -20,7 +20,7 @@ import {TranslateModule} from "@ngx-translate/core";
         <mat-form-field>
           <input matInput placeholder="Partner's email" [(ngModel)]="partnerEmail" name="partnerEmail" required>
         </mat-form-field>
-        <button mat-raised-button color="primary" type="submit">Invite</button>
+        <button mat-raised-button color="primary" type="submit">{{ 'INVITE' | translate }}</button>
       </form>
     </div>
   `,
