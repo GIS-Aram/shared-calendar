@@ -32,6 +32,7 @@
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist/frontend",
+            "baseHref": "/shared-calendar/",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -67,7 +68,8 @@
                   "maximumError": "4kb"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "baseHref": "/shared-calendar/"
             },
             "development": {
               "optimization": false,
