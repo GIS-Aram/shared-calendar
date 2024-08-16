@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 3000;
 
 connectDB();
 
-const ORIGIN =  'http://localhost:4200' || 'https://gis-aram.github.io';
+const ORIGIN =  'http://localhost:4200' || 'https://gis-aram.github.io/shared-calendar';
 
 const corsOptions = {
     origin: ORIGIN, // de URL van je frontend die je wilt toestaan
