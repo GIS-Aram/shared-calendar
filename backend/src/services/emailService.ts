@@ -83,6 +83,10 @@ export const sendEmail = async (provider: 'yahoo' | 'gmail' | 'outlook', to: str
     const transporter = createTransporter(provider);
 
     try {
+        if (!to) {
+            throw new Error("Recipient email address is missing");
+        }
+
         const info = await transporter.sendMail({
             from: process.env.EMAIL_FROM,
             to,

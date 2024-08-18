@@ -11,6 +11,8 @@ import { AppointmentService } from '../../services/appointment.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {MatSelectModule} from "@angular/material/select";
 import {NotificationService} from "../../services/notificatie.service";
+import {MatIcon, MatIconModule} from "@angular/material/icon";
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-appointment-form',
@@ -23,7 +25,20 @@ import {NotificationService} from "../../services/notificatie.service";
     MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatSelectModule
+    MatSelectModule,
+    MatIcon,
+    MatIconModule
+  ],
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('600ms ease-in', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('600ms ease-out', style({ opacity: 0 }))
+      ])
+    ])
   ],
   template: `
     <div class="appointment-form">
@@ -124,6 +139,41 @@ import {NotificationService} from "../../services/notificatie.service";
 <!--          <input matInput type="time" [(ngModel)]="endTime" name="endTime" required>-->
 <!--        </mat-form-field>-->
 
+        <div class="reminders-section">
+          <h3>Herinneringen</h3>
+          <button mat-raised-button color="primary" type="button" (click)="addReminder()" class="mb-3">
+            {{reminders && reminders.length ? 'Voeg nog een herinnering toe' : 'Herinnering toevoegen'}}
+          </button>
+
+          <div *ngIf="reminders.length === 0" class="no-reminders" @fadeInOut>
+            Er zijn geen herinneringen ingesteld voor deze afspraak.
+          </div>
+
+          <div *ngFor="let reminder of reminders; let i = index" class="reminder-item">
+            <mat-form-field>
+              <mat-label>Herinneringstijd</mat-label>
+              <mat-select [(ngModel)]="reminder.time" name="reminderTime{{i}}">
+                <mat-option [value]="15">15 minuten</mat-option>
+                <mat-option [value]="30">30 minuten</mat-option>
+                <mat-option [value]="60">1 uur</mat-option>
+                <mat-option [value]="1440">1 dag</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Type</mat-label>
+              <mat-select [(ngModel)]="reminder.type" name="reminderType{{i}}">
+                <mat-option value="email">E-mail</mat-option>
+                <mat-option value="push">Push notificatie</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <button mat-icon-button color="warn" type="button" (click)="removeReminder(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+
         <button mat-raised-button color="primary" type="submit" [disabled]="!appointmentForm.form.valid">
           {{isEditMode ? 'Update' : 'Create'}}
         </button>
@@ -142,6 +192,35 @@ import {NotificationService} from "../../services/notificatie.service";
       margin-bottom: 20px;
       display: block;
     }
+
+    /* herinneringsfunctionaliteit  */
+    .reminders-section {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .reminder-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .reminder-item mat-form-field {
+      margin-right: 10px;
+    }
+
+    .no-reminders {
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin-top: 20px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
   `]
 })
 export class AppointmentFormComponent implements OnInit {
@@ -160,6 +239,7 @@ export class AppointmentFormComponent implements OnInit {
   timeOptions: string[] = [];
   startTime: string = '00:00';
   endTime: string = '00:00';
+  reminders: { time: number, type: string }[] = [];
 
   constructor(
     private appointmentService: AppointmentService,
@@ -205,7 +285,8 @@ export class AppointmentFormComponent implements OnInit {
     this.appointmentService.getAppointmentById(id).subscribe(
       (appointment) => {
         this.appointment = appointment;
-        this.setDateTimeFields(new Date(appointment.startTime), new Date(appointment.endTime));
+        this.setDateTimeFields(new Date(appointment.startTime), new Date(appointment.endTime), false);
+        this.reminders = appointment.reminders || []; // Laad bestaande herinneringen
       },
       (error) => {
         console.error('Error loading appointment', error);
@@ -214,14 +295,16 @@ export class AppointmentFormComponent implements OnInit {
     );
   }
 
-  setDateTimeFields(start: Date, end: Date) {
-    // Stel de starttijd in op 09:00
-    start.setHours(9);
-    start.setMinutes(0);
+  setDateTimeFields(start: Date, end: Date, isNewAppointment: boolean = true) {
+    if (isNewAppointment) {
+      // Stel de starttijd in op 09:00
+      start.setHours(9);
+      start.setMinutes(0);
 
-    // Stel de eindtijd in op een uur later
-    end.setHours(9);
-    end.setMinutes(0);
+      // Stel de eindtijd in op een uur later
+      end.setHours(9);
+      end.setMinutes(0);
+    }
 
     this.startDate = start;
     this.startTime = `${start.getHours().toString().padStart(2, '0')}:${start.getMinutes().toString().padStart(2, '0')}`;
@@ -271,6 +354,10 @@ export class AppointmentFormComponent implements OnInit {
       this.appointment.startTime = this.combineDateAndTime(this.startDate, this.startTime);
       this.appointment.endTime = this.combineDateAndTime(this.endDate, this.endTime);
 
+
+      this.appointment.reminders = this.reminders;
+
+
       if (this.isEditMode) {
         this.appointmentService.updateAppointment(this.appointment._id, this.appointment).subscribe(
           () => {
@@ -312,6 +399,14 @@ export class AppointmentFormComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/calendar']);
+    // this.router.navigate(['/calendar']);
+    window.history.back();
+  }
+
+  addReminder() {
+    this.reminders.push({ time: 15, type: 'email' });
+  }
+  removeReminder(index: number) {
+    this.reminders.splice(index, 1);
   }
 }

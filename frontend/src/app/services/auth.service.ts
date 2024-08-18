@@ -36,6 +36,16 @@ export class AuthService {
         return user;
       }));
   }
+  // login(email: string, password: string): Observable<any> {
+  //   return this.http.post<any>(`${environment.apiUrl}/users/login`, { email, password })
+  //     .pipe(map(response => {
+  //       const user = JSON.parse(JSON.stringify(response.result));
+  //       user.email = email; // Voeg het email expliciet toe
+  //       localStorage.setItem('currentUser', JSON.stringify(user));
+  //       this.currentUserSubject.next(user);
+  //       return user;
+  //     }));
+  // }
 
   logout() {
     localStorage.removeItem('currentUser');

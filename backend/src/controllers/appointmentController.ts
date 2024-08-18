@@ -80,7 +80,7 @@ export const createAppointment_Werkend = async (req: Request, res: Response) => 
 };
 export const createAppointment = async (req: Request, res: Response) => {
     try {
-        const { startTime, endTime, title, description } = req.body;
+        const { startTime, endTime, title, description, reminders  } = req.body;
 
         // Controleer voor overlappende afspraken
         const overlappingAppointment = await Appointment.findOne({
@@ -103,6 +103,7 @@ export const createAppointment = async (req: Request, res: Response) => {
             description,
             startTime,
             endTime,
+            reminders,
             userId: req.userId
         });
         await newAppointment.save();
@@ -122,6 +123,9 @@ export const createAppointment = async (req: Request, res: Response) => {
             }
         }
 
+        // Schedule reminders
+        scheduleReminders(newAppointment);
+
         // Stuur een e-mail notificatie (optioneel, afhankelijk van je vereisten)
         // await sendEmail('gmail', req.body.email, 'Nieuwe afspraak', 'Er is een nieuwe afspraak gemaakt.');
 
@@ -132,6 +136,37 @@ export const createAppointment = async (req: Request, res: Response) => {
     } catch (error: any) {
         console.error('Error creating appointment:', error);
         res.status(500).json({ message: 'Error creating appointment', error: error.message });
+    }
+};
+
+const scheduleReminders = (appointment: any) => {
+    appointment.reminders.forEach((reminder: any) => {
+        const reminderTime = new Date(appointment.startTime.getTime() - reminder.time * 60000);
+        const now = new Date();
+
+        if (reminderTime > now) {
+            setTimeout(() => {
+                sendReminderEmail(appointment, reminder);
+            }, reminderTime.getTime() - now.getTime());
+        }
+    });
+};
+
+const sendReminderEmail = async (appointment: any, reminder: any) => {
+    try {
+        const user = await User.findById(appointment.userId);
+        if (!user || !user.email) {
+            throw new Error("User email not found");
+        }
+
+        await sendEmail(
+            'gmail', // of een andere provider die u gebruikt
+            user.email,
+            'Herinnering voor afspraak',
+            `U heeft een afspraak "${appointment.title}" over ${reminder.time} minuten.`
+        );
+    } catch (error) {
+        console.error('Error sending reminder email:', error);
     }
 };
 

@@ -13,7 +13,16 @@ const AppointmentSchema: Schema = new Schema({
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
     // userId: { type: String, required: true },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+
+    reminders: [{
+        time: Number, // tijd in minuten voor de afspraak
+        type: {
+            type: String,
+            enum: ['email', 'push'], // of andere types die u wilt ondersteunen
+            default: 'email'
+        }
+    }]
 });
 
 // Create the model and explicitly specify the document interface and model interface

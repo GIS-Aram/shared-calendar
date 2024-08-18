@@ -53,38 +53,145 @@ import {UserService} from "../../services/user.service";
       </mat-card>
     </div>
   `,
+  // styles: [`
+  //   .container {
+  //     max-width: 600px;
+  //     margin: 20px auto;
+  //     position: relative;
+  //   }
+  //   .appointment-card {
+  //     max-width: 600px;
+  //     margin: 20px auto;
+  //     padding: 20px;
+  //   }
+  //   .info-row {
+  //     display: flex;
+  //     align-items: center;
+  //     margin-bottom: 10px;
+  //   }
+  //   .info-row mat-icon {
+  //     margin-right: 10px;
+  //     color: #555;
+  //   }
+  //   .description {
+  //     white-space: pre-wrap;
+  //     margin: 15px 0;
+  //   }
+  //   .my-3 {
+  //     margin: 15px 0;
+  //   }
+  //   .back-button {
+  //     position: absolute;
+  //     top: -40px;
+  //     left: 0;
+  //   }
+  // `]
   styles: [`
     .container {
-      max-width: 600px;
-      margin: 20px auto;
+      max-width: 700px;
+      margin: 60px auto;
       position: relative;
+      padding: 15px;
+      background-color: #f5f5f5;
     }
+
     .appointment-card {
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 20px;
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 1px solid #e0e0e0;
+      margin-top: 20px;
+      padding-top: 20px;
     }
+    .appointment-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+
     .info-row {
       display: flex;
       align-items: center;
       margin-bottom: 10px;
-    }
-    .info-row mat-icon {
-      margin-right: 10px;
+      font-size: 14px;
       color: #555;
     }
+
+    .info-row mat-icon {
+      margin-right: 10px;
+      color: #00796b;
+    }
+
     .description {
       white-space: pre-wrap;
       margin: 15px 0;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #333;
     }
+
     .my-3 {
       margin: 15px 0;
     }
+
     .back-button {
       position: absolute;
       top: -40px;
       left: 0;
+      background-color: #00796b;
+      color: white;
     }
+
+    mat-card-title {
+      font-size: 26px;
+      font-weight: bold;
+      color: #00695c;
+    }
+
+    mat-card-subtitle {
+      font-size: 16px;
+      color: #757575;
+    }
+
+    mat-card-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding: 16px;
+    }
+
+    mat-card-actions button {
+      margin-left: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    mat-card-actions button:hover {
+      transform: scale(1.1);
+      background-color: #004d40;
+      color: white;
+    }
+    .back-button {
+      position: absolute;
+      top: -60px;
+      left: 0;
+      margin-bottom: 20px;
+      background-color: #004d40;
+      color: white;
+      border-radius: 50%;
+      height: 50px;
+      width: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #002f2c;
+    }
+
   `]
 })
 export class AppointmentDetailComponent implements OnInit {

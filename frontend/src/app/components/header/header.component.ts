@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {Router, RouterLink, RouterLinkActive} from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -10,11 +10,14 @@ import {MatDialog} from "@angular/material/dialog";
 import {LogoutConfirmationDialogComponent} from "../logout-confirmation-dialog/logout-confirmation-dialog.component";
 import {TranslateModule, TranslateService} from "@ngx-translate/core";
 import {MatFormField, MatOption, MatSelect} from "@angular/material/select";
+import {MatMenu, MatMenuModule, MatMenuTrigger} from "@angular/material/menu";
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, MatToolbarModule, MatButtonModule, MatIconModule, TranslateModule, MatSelect, MatOption, MatFormField],
+  imports: [CommonModule, RouterLink, RouterLinkActive, MatToolbarModule, MatButtonModule, MatIconModule,
+    TranslateModule, MatSelect, MatOption, MatFormField, MatMenuTrigger, MatMenu, MatMenuModule
+  ],
   template: `
 <!--    <mat-toolbar color="primary">-->
 <!--      <span>Shared Calendar App</span>-->
@@ -55,7 +58,18 @@ import {MatFormField, MatOption, MatSelect} from "@angular/material/select";
     <a mat-button routerLink="/calendar" routerLinkActive="active">{{ 'CALENDAR' | translate }}</a>
     <a mat-button routerLink="/appointments" routerLinkActive="active">{{ 'APPOINTMENTS' | translate }}</a>
     <a mat-button routerLink="/invite-partner" routerLinkActive="active">{{ 'INVITE_PARTNER' | translate }}</a>
-    <button mat-button (click)="logout()" class="logout-btn">{{ 'LOGOUT' | translate }}</button>
+<!--    <button mat-button (click)="logout()" class="logout-btn">{{ 'LOGOUT' | translate }}</button>-->
+
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-trigger">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    <mat-menu #userMenu="matMenu" class="user-menu">
+      <div class="user-email">{{ userEmail }}</div>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>{{ 'LOGOUT' | translate }}</span>
+      </button>
+    </mat-menu>
   </ng-container>
 <!--  <mat-form-field appearance="outline" class="language-select">-->
 <!--    <mat-select [value]="currentLang" (selectionChange)="changeLanguage($event.value)">-->
@@ -212,12 +226,39 @@ import {MatFormField, MatOption, MatSelect} from "@angular/material/select";
       }
     }
 
+    /** User Dropdown Menu */
+    .user-menu-trigger {
+      margin-left: 8px;
+    }
+
+    .user-menu {
+      min-width: 200px;
+    }
+
+    .user-email {
+      padding: 16px;
+      font-weight: bold;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    @media (max-width: 600px) {
+      .app-title {
+        font-size: 16px;
+      }
+
+      a[mat-button], button[mat-button] {
+        min-width: 0;
+        padding: 0 8px;
+      }
+    }
 
   `]
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   @Output() menuToggle = new EventEmitter<void>();
   currentLang = 'nl'; // Standaardtaal instellen
+  userEmail: string = '';
+
   constructor(
     public authService: AuthService,
     private router: Router,
@@ -227,6 +268,14 @@ export class HeaderComponent {
   ) {
     // De standaardtaal instellen op basis van de ingestelde taal in de service
     this.currentLang = this.translate.currentLang || this.translate.getDefaultLang();
+  }
+
+  ngOnInit(): void {
+    this.authService.currentUser.subscribe(
+      user => {
+        this.userEmail = user?.result?.email || '';
+      }
+    );
   }
 
   logout() {
@@ -240,6 +289,7 @@ export class HeaderComponent {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.authService.logout();
+        this.userEmail = ''; // Wis het e-mailadres
         this.notificationService.showInfo('U bent uitgelogd', '');
         this.router.navigate(['/login']);
       }
