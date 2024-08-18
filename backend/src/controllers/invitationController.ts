@@ -4,7 +4,7 @@ import User from '../models/user';
 import {IUser} from "../types/user";
 import bcrypt from 'bcryptjs';
 
-export const acceptInvitation = async (req: Request, res: Response) => {
+export const acceptInvitation_Werkend = async (req: Request, res: Response) => {
     try {
         const { token } = req.params;
         const invitation = await Invitation.findOne({ token, isAccepted: false, expiresAt: { $gt: new Date() } }) as IInvitation | null;
@@ -41,7 +41,7 @@ export const acceptInvitation = async (req: Request, res: Response) => {
     }
 };
 
-export const acceptInvitation__Werkend = async (req: Request, res: Response) => {
+export const acceptInvitation = async (req: Request, res: Response) => {
     try {
         const { token } = req.params;
         const invitation = await Invitation.findOne({ token, isAccepted: false, expiresAt: { $gt: new Date() } }) as IInvitation | null;
