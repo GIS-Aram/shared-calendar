@@ -11,8 +11,6 @@ import { AppointmentService } from '../../services/appointment.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {MatSelectModule} from "@angular/material/select";
 import {NotificationService} from "../../services/notificatie.service";
-import {ToastrService} from "ngx-toastr";
-import {provideAnimations} from "@angular/platform-browser/animations";
 
 @Component({
   selector: 'app-appointment-form',
@@ -78,9 +76,10 @@ import {provideAnimations} from "@angular/platform-browser/animations";
 <!--        </mat-form-field>-->
         <mat-form-field>
           <mat-label>Start Tijd</mat-label>
-          <mat-select [(ngModel)]="startTime" name="startTime" required #titleField="ngModel">
-            <mat-option *ngFor="let time of timeOptions" [value]="time">{{time}}</mat-option>
-          </mat-select>
+<!--          <mat-select [(ngModel)]="startTime" name="startTime" required #titleField="ngModel">-->
+<!--            <mat-option *ngFor="let time of timeOptions" [value]="time">{{time}}</mat-option>-->
+<!--          </mat-select>-->
+          <input matInput type="time" [(ngModel)]="startTime" name="startTime" (ngModelChange)="onStartTimeChange()" required>
           <mat-error *ngIf="titleField.invalid && (titleField.dirty || titleField.touched)">
             Starttijd is verplicht
           </mat-error>
@@ -111,9 +110,10 @@ import {provideAnimations} from "@angular/platform-browser/animations";
 <!--        </mat-form-field>-->
         <mat-form-field>
           <mat-label>Eind Tijd</mat-label>
-          <mat-select [(ngModel)]="endTime" name="endTime" required #titleField="ngModel">
-            <mat-option *ngFor="let time of timeOptions" [value]="time">{{time}}</mat-option>
-          </mat-select>
+<!--          <mat-select [(ngModel)]="endTime" name="endTime" required #titleField="ngModel">-->
+<!--            <mat-option *ngFor="let time of timeOptions" [value]="time">{{time}}</mat-option>-->
+<!--          </mat-select>-->
+          <input matInput type="time" [(ngModel)]="endTime" name="endTime" required>
           <mat-error *ngIf="titleField.invalid && (titleField.dirty || titleField.touched)">
             Eindtijd is verplicht
           </mat-error>
@@ -182,13 +182,20 @@ export class AppointmentFormComponent implements OnInit {
       const endStr = this.route.snapshot.queryParamMap.get('end');
       if (startStr && endStr) {
         this.setDateTimeFields(new Date(startStr), new Date(endStr));
+      } else {
+        // Als er geen start en eindtijd is, stel dan de standaardwaarden in
+        const now = new Date();
+        this.startDate = now;
+        this.startTime = '09:00';
+        this.endDate = now;
+        this.endTime = '10:00';
       }
     }
   }
 
   generateTimeOptions() {
     for (let hour = 0; hour < 24; hour++) {
-      for (let minute = 0; minute < 60; minute += 15) {
+      for (let minute = 0; minute < 60; minute++) { // minute += 15
         this.timeOptions.push(`${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`);
       }
     }
@@ -208,15 +215,40 @@ export class AppointmentFormComponent implements OnInit {
   }
 
   setDateTimeFields(start: Date, end: Date) {
+    // Stel de starttijd in op 09:00
+    start.setHours(9);
+    start.setMinutes(0);
+
+    // Stel de eindtijd in op een uur later
+    end.setHours(9);
+    end.setMinutes(0);
+
     this.startDate = start;
     this.startTime = `${start.getHours().toString().padStart(2, '0')}:${start.getMinutes().toString().padStart(2, '0')}`;
-    this.endDate = end;
-    this.endTime = `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`;
+    // this.endDate = end;
+    // this.endTime = `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`;
+
+    // Zorg ervoor dat End Date hetzelfde is als Start Date.
+    this.endDate = start; // Gebruik de start datum in plaats van end datum
+    this.endTime = `${(start.getHours() + 1).toString().padStart(2, '0')}:${start.getMinutes().toString().padStart(2, '0')}`; // Voeg een uur toe voor de eindtijd.
   }
 
   formatTime(date: Date): string {
     return date.toTimeString().slice(0, 5);
   }
+
+  onStartTimeChange() {
+    // Parse de starttijd die door de gebruiker is geselecteerd
+    const [hours, minutes] = this.startTime.split(':').map(Number);
+
+    // Stel de eindtijd in op één uur na de starttijd
+    const end = new Date();
+    end.setHours(hours + 1, minutes);
+
+    // Stel de eindtijd in het juiste formaat in
+    this.endTime = `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`;
+  }
+
 
   onSubmit(form: NgForm) {
     // if (!this.startDate || !this.endDate) {

@@ -1,4 +1,4 @@
-import {ApplicationConfig, importProvidersFrom, isDevMode} from '@angular/core';
+import {ApplicationConfig, importProvidersFrom, isDevMode, LOCALE_ID} from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -11,10 +11,14 @@ import {authInterceptor} from "./services/auth.interceptor";
 import {TranslateHttpLoader} from "@ngx-translate/http-loader";
 import {TranslateLoader, TranslateModule} from "@ngx-translate/core";
 import { provideServiceWorker } from '@angular/service-worker';
+import {registerLocaleData} from "@angular/common";
+import localeNl from '@angular/common/locales/nl';
 
 // export const appConfig: ApplicationConfig = {
 //   providers: [provideRouter(routes), provideAnimationsAsync()]
 // };
+// datums en tijden volgens de Nederlandse notatie weergeven
+registerLocaleData(localeNl, 'nl-NL');
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -29,6 +33,7 @@ export const appConfig: ApplicationConfig = {
     // }),
     provideNativeDateAdapter(),
     { provide: MAT_DATE_LOCALE, useValue: 'nl-NL' }, // of 'nl-NL' voor Nederlands, 'en-GB' voor Engeland
+    { provide: LOCALE_ID, useValue: 'nl-NL' }, // datums en tijden volgens de Nederlandse notatie weergeven
     // Voeg de TranslateModule toe via importProvidersFrom
     importProvidersFrom(TranslateModule.forRoot({
         loader: {
@@ -49,3 +54,5 @@ export const appConfig: ApplicationConfig = {
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
+
+
