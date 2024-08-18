@@ -111,6 +111,10 @@ export const invitePartner = async (req: Request, res: Response) => {
         await invitation.save();
 
         // Genereer de uitnodigingslink
+        const baseUrl = process.env.NODE_ENV === 'production'
+            ? 'https://gis-aram.github.io/shared-calendar'
+            : 'http://localhost:4200';
+        // const invitationLink = `${baseUrl}/accept-invitation/${token}`;
         const invitationLink = `${process.env.FRONTEND_URL}/accept-invitation/${token}`;
 
         // Stuur een e-mail naar de partner

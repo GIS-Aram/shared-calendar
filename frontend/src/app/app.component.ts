@@ -1,6 +1,6 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {RouterOutlet, RouterLink, RouterLinkActive, Router} from '@angular/router';
+import {RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd} from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import {MatSidenav, MatSidenavModule} from '@angular/material/sidenav';
@@ -14,6 +14,8 @@ import {
   LogoutConfirmationDialogComponent
 } from "./components/logout-confirmation-dialog/logout-confirmation-dialog.component";
 import { TranslateModule, TranslateService} from "@ngx-translate/core";
+import { Subscription } from "rxjs";
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -160,9 +162,10 @@ import { TranslateModule, TranslateService} from "@ngx-translate/core";
     }
   `]
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'shared-calendar-app';
   @ViewChild('sidenav') sidenav!: MatSidenav;
+  private routerSubscription: Subscription | undefined;
 
   constructor(public authService: AuthService,
               public notificationService: NotificationService,
@@ -177,10 +180,26 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.authService['checkTokenExpiration']();
 
-    if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/calendar']);
-    } else {
-      this.router.navigate(['/login']);
+    this.routerSubscription = this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      const isAcceptInvitationRoute = event.urlAfterRedirects.includes('/accept-invitation');
+      const isLoginRoute = event.urlAfterRedirects === '/login';
+      const isRegisterRoute = event.urlAfterRedirects === '/register';
+
+      if (!this.authService.isLoggedIn()) {
+        if (!isAcceptInvitationRoute && !isLoginRoute && !isRegisterRoute) {
+          this.router.navigate(['/login']);
+        }
+      } else if (isLoginRoute || isRegisterRoute) {
+        this.router.navigate(['/calendar']);
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
     }
   }
 

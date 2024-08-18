@@ -61,6 +61,7 @@ export class AcceptInvitationComponent implements OnInit {
 
   ngOnInit() {
     const token = this.route.snapshot.paramMap.get('token');
+
     if (token) {
       this.acceptInvitation(token);
     } else {
