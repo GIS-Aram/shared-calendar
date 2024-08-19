@@ -5,6 +5,7 @@ import appointmentRoutes from './routes/appointmentRoutes';
 import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes";
 import invitationRoutes from "./routes/invitationRoutes";
+import taskRoutes from "./routes/taskRoutes";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/invitations', invitationRoutes);
+app.use('/api/tasks', taskRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

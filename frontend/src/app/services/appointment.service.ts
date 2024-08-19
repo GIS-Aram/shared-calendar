@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {catchError, Observable, tap, throwError} from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -32,15 +32,37 @@ export class AppointmentService {
   createAppointment(appointment: any): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.post<any>(this.apiUrl, appointment, { headers });
+    // return this.http.post<any>(this.apiUrl, appointment, { headers });
+    // console.log('Creating appointment with data:', appointment); // Debugging
+    // return this.http.post<any>(this.apiUrl, appointment, { headers }).pipe(
+    //   tap(response => console.log('Create appointment response:', response)) // Debugging
+    // );
+    return this.http.post<any>(this.apiUrl, appointment, { headers }).pipe(
+      catchError(error => {
+        if (error.status === 409) {
+          return throwError('An overlapping appointment already exists.');
+        }
+        return throwError('An error occurred while creating the appointment.');
+      })
+    );
   }
 
   updateAppointment(id: string, appointment: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, appointment);
+    // return this.http.put<any>(`${this.apiUrl}/${id}`, appointment);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put<any>(`${this.apiUrl}/${id}`, appointment, { headers });
+    // console.log('Updating appointment with data:', appointment); // Debugging
+    // return this.http.put<any>(`${this.apiUrl}/${id}`, appointment, { headers }).pipe(
+    //   tap(response => console.log('Update appointment response:', response)) // Debugging
+    // );
   }
 
   deleteAppointment(id: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+    // return this.http.delete<any>(`${this.apiUrl}/${id}`);
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.delete<any>(`${this.apiUrl}/${id}`, { headers });
   }
 
   private getCurrentUserId(): string {

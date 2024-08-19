@@ -80,7 +80,8 @@ export const createAppointment_Werkend = async (req: Request, res: Response) => 
 };
 export const createAppointment = async (req: Request, res: Response) => {
     try {
-        const { startTime, endTime, title, description, reminders  } = req.body;
+        const { startTime, endTime, title, description, reminders, taskIds  } = req.body;
+        console.log('Creating appointment with data:', req.body); // Debugging
 
         // Controleer voor overlappende afspraken
         const overlappingAppointment = await Appointment.findOne({
@@ -104,6 +105,7 @@ export const createAppointment = async (req: Request, res: Response) => {
             startTime,
             endTime,
             reminders,
+            taskIds,
             userId: req.userId
         });
         await newAppointment.save();
@@ -239,13 +241,50 @@ export const getAppointmentById = async (req: Request, res: Response): Promise<v
 //         res.status(400).json({ message: 'Error updating appointment', error });
 //     }
 // };
-export const updateAppointment = async (req: Request, res: Response) => {
+export const updateAppointment_old = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const updatedAppointment = await Appointment.findByIdAndUpdate(id, req.body, { new: true });
         res.json(updatedAppointment);
     } catch (error: any) {
         res.status(400).json({ message: error.message });
+    }
+};
+
+export const updateAppointment = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { title, description, startTime, endTime, reminders, taskIds } = req.body;
+
+        const user = await User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const update = { ...req.body, updatedBy: req.userId, updatedAt: new Date() };
+        // const appointment = await Appointment.findOneAndUpdate(
+        //     { _id: id, userId: req.userId },
+        //     { title, description, startTime, endTime, reminders, taskIds },
+        //     { new: true }
+        // );
+        const appointment = await Appointment.findOneAndUpdate(
+            {
+                _id: id,
+                $or: [
+                    { userId: req.userId },
+                    { sharedWith: req.userId },
+                    { userId: user.partner },
+                    { sharedWith: user.partner }
+                ]
+            },
+            update,
+            { new: true }
+        );
+        if (!appointment) {
+            return res.status(404).json({ message: 'Appointment not found' });
+        }
+        res.status(200).json(appointment);
+    } catch (error: any) {
+        res.status(500).json({ message: 'Error updating appointment', error: error.message });
     }
 };
 

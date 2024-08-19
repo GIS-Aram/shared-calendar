@@ -17,6 +17,8 @@ import {MatDatepicker, MatDatepickerInput, MatDatepickerToggle} from "@angular/m
 import {MatSort, MatSortModule} from "@angular/material/sort";
 import {animate, style, transition, trigger} from "@angular/animations";
 import {MatExpansionModule, MatExpansionPanel, MatExpansionPanelTitle} from "@angular/material/expansion";
+import {MatCard, MatCardActions, MatCardHeader, MatCardSubtitle, MatCardTitle} from "@angular/material/card";
+import {TranslateModule} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-appointment-list',
@@ -26,7 +28,7 @@ import {MatExpansionModule, MatExpansionPanel, MatExpansionPanelTitle} from "@an
     MatFormFieldModule,
     MatSelectModule,
     FormsModule, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSortModule, MatExpansionPanel, MatExpansionPanelTitle,
-    MatExpansionModule
+    MatExpansionModule, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardActions, TranslateModule
   ],
   animations: [
     trigger('fadeIn', [
@@ -38,7 +40,7 @@ import {MatExpansionModule, MatExpansionPanel, MatExpansionPanelTitle} from "@an
   ],
   template: `
     <div class="appointment-list">
-      <h1 class="page-title">Appointments</h1>
+      <h1 class="page-title">{{ 'APPOINTMENTS' | translate }}</h1>
       <mat-expansion-panel>
         <mat-expansion-panel-header>
           <mat-panel-title>
@@ -96,40 +98,70 @@ import {MatExpansionModule, MatExpansionPanel, MatExpansionPanelTitle} from "@an
 <!--      </div>-->
 
 <!--      <ng-template #appointmentTable>-->
-      <table *ngIf="filteredAppointments" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 custom-table mt-3">
-        <ng-container matColumnDef="title">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
-          <td mat-cell *matCellDef="let appointment"> {{appointment.title}} </td>
-        </ng-container>
 
-        <ng-container matColumnDef="startTime">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Start Time </th>
-          <td mat-cell *matCellDef="let appointment"> {{appointment.startTime | date:'short'}} </td>
-        </ng-container>
 
-        <ng-container matColumnDef="endTime">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> End Time </th>
-          <td mat-cell *matCellDef="let appointment"> {{appointment.endTime | date:'short'}} </td>
-        </ng-container>
+      <!-- Tabel voor middelgrote en grote schermen -->
+      <div class="table-container hide-on-mobile">
+        <table *ngIf="filteredAppointments" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 custom-table mt-3">
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
+            <td mat-cell *matCellDef="let appointment"> {{appointment.title}} </td>
+          </ng-container>
 
-        <ng-container matColumnDef="actions">
-          <th mat-header-cell *matHeaderCellDef> Actions </th>
-          <td mat-cell *matCellDef="let appointment">
-            <button mat-icon-button color="primary" (click)="viewAppointment(appointment._id)">
+          <ng-container matColumnDef="startTime">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Start Time </th>
+            <td mat-cell *matCellDef="let appointment"> {{appointment.startTime | date:'short'}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="endTime">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> End Time </th>
+            <td mat-cell *matCellDef="let appointment"> {{appointment.endTime | date:'short'}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let appointment">
+              <button mat-icon-button color="primary" (click)="viewAppointment(appointment._id)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button color="primary" (click)="editAppointment(appointment._id)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteAppointment(appointment._id)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" @fadeIn></tr>
+        </table>
+      </div>
+
+
+      <!-- Kaarten voor mobiele schermen -->
+      <div class="appointment-cards hide-on-desktop">
+        <mat-card *ngFor="let appointment of filteredAppointments" class="appointment-card" @fadeIn>
+          <mat-card-header>
+            <mat-card-title>{{ appointment.title }}</mat-card-title>
+            <mat-card-subtitle>
+              {{ appointment.startTime | date:'short' }} - {{ appointment.endTime | date:'short' }}
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-actions>
+            <button mat-icon-button (click)="viewAppointment(appointment._id)" matTooltip="View">
               <mat-icon>visibility</mat-icon>
             </button>
-            <button mat-icon-button color="primary" (click)="editAppointment(appointment._id)">
+            <button mat-icon-button (click)="editAppointment(appointment._id)" matTooltip="Edit">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button color="warn" (click)="deleteAppointment(appointment._id)">
+            <button mat-icon-button (click)="deleteAppointment(appointment._id)" matTooltip="Delete">
               <mat-icon>delete</mat-icon>
             </button>
-          </td>
-        </ng-container>
+          </mat-card-actions>
+        </mat-card>
+      </div>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;" @fadeIn></tr>
-      </table>
 <!--      </ng-template>-->
       <div *ngIf="filteredAppointments.length === 0;" class="no-results" @fadeIn> <!-- else appointmentTable -->
         <p>Er zijn geen afspraken gevonden die overeenkomen met de geselecteerde filters.</p>
@@ -240,7 +272,48 @@ import {MatExpansionModule, MatExpansionPanel, MatExpansionPanelTitle} from "@an
       }
     }
 
+    /* Hide on mobile */
+    .hide-on-mobile {
+      display: none;
+    }
 
+    /* Hide on desktop */
+    .hide-on-desktop {
+      display: block;
+    }
+
+    /* List of appointments */
+    .appointment-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .appointment-card {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 600px) {
+      .appointment-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .hide-on-mobile {
+        display: block;
+      }
+
+      .hide-on-desktop {
+        display: none;
+      }
+
+      .table-container {
+        overflow-x: auto;
+      }
+    }
 
   `]
 })

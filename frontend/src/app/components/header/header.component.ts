@@ -56,6 +56,7 @@ import {MatMenu, MatMenuModule, MatMenuTrigger} from "@angular/material/menu";
   </ng-container>
   <ng-container *ngIf="authService.isLoggedIn()">
     <a mat-button routerLink="/calendar" routerLinkActive="active">{{ 'CALENDAR' | translate }}</a>
+    <a mat-button routerLink="/tasks" routerLinkActive="active">Taken</a>
     <a mat-button routerLink="/appointments" routerLinkActive="active">{{ 'APPOINTMENTS' | translate }}</a>
     <a mat-button routerLink="/invite-partner" routerLinkActive="active">{{ 'INVITE_PARTNER' | translate }}</a>
 <!--    <button mat-button (click)="logout()" class="logout-btn">{{ 'LOGOUT' | translate }}</button>-->

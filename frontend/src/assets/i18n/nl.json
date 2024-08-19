@@ -10,5 +10,8 @@
   "EMAIL": "E-mail",
   "PASSWORD": "Wachtwoord",
   "CONFIRM_PASSWORD": "Bevestig Wachtwoord",
-  "INVITE": "Uitnodigen"
+  "INVITE": "Uitnodigen",
+  "TASKS": "Taken",
+  "NO_TASKS": "Geen taken toegewezen aan deze afspraak.",
+  "NO_REMINDERS": "Geen herinneringen ingesteld voor deze afspraak."
 }

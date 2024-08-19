@@ -9,6 +9,7 @@ import {AuthGuard} from "./guards/auth.guard";
 import {AcceptInvitationComponent} from "./components/accept-invitation/accept-invitation.component";
 import {AppointmentDetailComponent} from "./components/appointment-detail/appointment-detail.component";
 import {AcceptInvitationGuard} from "./guards/accept-invitation.guard";
+import {TaskListComponent} from "./components/task-list/task-list.component";
 
 export const routes: Routes = [
   { path: 'calendar', component: CalendarComponent, canActivate: [AuthGuard] },
@@ -26,6 +27,6 @@ export const routes: Routes = [
     canActivate: [AcceptInvitationGuard]
   },
 
-
+  { path: 'tasks', component: TaskListComponent, canActivate: [AuthGuard] },
   { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];

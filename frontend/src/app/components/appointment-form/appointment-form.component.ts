@@ -13,6 +13,9 @@ import {MatSelectModule} from "@angular/material/select";
 import {NotificationService} from "../../services/notificatie.service";
 import {MatIcon, MatIconModule} from "@angular/material/icon";
 import { trigger, transition, style, animate } from '@angular/animations';
+import {TaskService} from "../../services/task.service";
+import {MatChip, MatChipListbox, MatChipsModule} from "@angular/material/chips";
+import {AuthService} from "../../services/auth.service";
 
 @Component({
   selector: 'app-appointment-form',
@@ -27,7 +30,10 @@ import { trigger, transition, style, animate } from '@angular/animations';
     MatNativeDateModule,
     MatSelectModule,
     MatIcon,
-    MatIconModule
+    MatIconModule,
+    MatChip,
+    MatChipsModule,
+    MatChipListbox
   ],
   animations: [
     trigger('fadeInOut', [
@@ -174,7 +180,48 @@ import { trigger, transition, style, animate } from '@angular/animations';
           </div>
         </div>
 
-        <button mat-raised-button color="primary" type="submit" [disabled]="!appointmentForm.form.valid">
+<!--        <mat-form-field>-->
+<!--          <mat-label>Taak toewijzen</mat-label>-->
+<!--          <mat-select (selectionChange)="assignTask($event.value)">-->
+<!--            <mat-option *ngFor="let task of tasks" [value]="task._id">-->
+<!--              {{ task.title }}-->
+<!--            </mat-option>-->
+<!--          </mat-select>-->
+<!--        </mat-form-field>-->
+
+        <mat-form-field>
+          <mat-label>Taken toewijzen</mat-label>
+          <mat-select [(ngModel)]="appointment.taskIds" name="taskIds" (selectionChange)="assignTask($event.value)" multiple>
+            <mat-option *ngFor="let task of availableTasks" [value]="task._id">
+              {{ task.title }} {{ task.isAssigned ? '(Toegewezen)' : '' }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+<!--        <div *ngIf="appointment.taskIds && appointment.taskIds.length > 0" class="assigned-tasks">-->
+<!--          <h3>Toegewezen taken:</h3>-->
+<!--          <ul>-->
+<!--            <li *ngFor="let taskId of appointment.taskIds">-->
+<!--              {{ getTaskTitle(taskId) }}-->
+<!--              <button mat-icon-button (click)="removeTask(taskId)" matTooltip="Verwijder taak">-->
+<!--                <mat-icon>close</mat-icon>-->
+<!--              </button>-->
+<!--            </li>-->
+<!--          </ul>-->
+<!--        </div>-->
+        <div *ngIf="appointment.taskIds && appointment.taskIds.length > 0" class="assigned-tasks">
+          <h3>Toegewezen taken:</h3>
+          <mat-chip-listbox>
+            <mat-chip-option *ngFor="let taskId of appointment.taskIds" (removed)="removeTask(taskId)">
+              {{ getTaskTitle(taskId) }}
+              <button matChipRemove>
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip-option>
+          </mat-chip-listbox>
+        </div>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="!appointmentForm.form.valid || (isEditMode && !canEditAppointment(appointment))">
           {{isEditMode ? 'Update' : 'Create'}}
         </button>
         <button mat-button type="button" (click)="goBack()">Annuleren</button>
@@ -221,10 +268,30 @@ import { trigger, transition, style, animate } from '@angular/animations';
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     }
 
+    /* Toegewezen taken */
+    .assigned-tasks {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .assigned-tasks h3 {
+      margin-bottom: 10px;
+    }
+
+    mat-chip-list {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    mat-chip {
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
   `]
 })
 export class AppointmentFormComponent implements OnInit {
-  appointment: any = {};
+  appointment: any = {taskIds: [], userId: '', sharedWith: []};
   isEditMode = false;
   startDate: Date | null = null;
   // startTime: string = '';
@@ -240,13 +307,16 @@ export class AppointmentFormComponent implements OnInit {
   startTime: string = '00:00';
   endTime: string = '00:00';
   reminders: { time: number, type: string }[] = [];
+  availableTasks: any[] = [];
 
   constructor(
     private appointmentService: AppointmentService,
     private route: ActivatedRoute,
     private router: Router,
     private snackBar: MatSnackBar,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private taskService: TaskService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -271,6 +341,8 @@ export class AppointmentFormComponent implements OnInit {
         this.endTime = '10:00';
       }
     }
+
+    this.loadAvailableTasks();
   }
 
   generateTimeOptions() {
@@ -285,8 +357,15 @@ export class AppointmentFormComponent implements OnInit {
     this.appointmentService.getAppointmentById(id).subscribe(
       (appointment) => {
         this.appointment = appointment;
+
+        if (!this.appointment.taskIds) {
+          this.appointment.taskIds = [];
+        }
+
         this.setDateTimeFields(new Date(appointment.startTime), new Date(appointment.endTime), false);
         this.reminders = appointment.reminders || []; // Laad bestaande herinneringen
+        this.loadAvailableTasks();
+        console.log('Loaded appointment:', this.appointment); // Voor debugging
       },
       (error) => {
         console.error('Error loading appointment', error);
@@ -356,6 +435,8 @@ export class AppointmentFormComponent implements OnInit {
 
 
       this.appointment.reminders = this.reminders;
+      this.appointment.taskIds = this.appointment.taskIds || [];
+      console.log('Submitting appointment with tasks:', this.appointment.taskIds); // Voor debugging
 
 
       if (this.isEditMode) {
@@ -366,8 +447,14 @@ export class AppointmentFormComponent implements OnInit {
             this.router.navigate(['/calendar']);
           },
           (error) => {
-            console.error('Error updating appointment', error);
-            this.snackBar.open('Error updating appointment', 'Close', { duration: 3000 });
+            console.error('Error creating appointment', error);
+            if (error === 'An overlapping appointment already exists.') {
+              // this.snackBar.open('Er bestaat al een afspraak op dit tijdstip. Kies alstublieft een ander tijdstip.', 'Sluiten', { duration: 5000 });
+              this.notificationService.showError('Er bestaat al een afspraak op dit tijdstip. Kies alstublieft een ander tijdstip.', 'Foutmelding Aanmaken Afspraak');
+            } else {
+              this.snackBar.open('Error creating appointment', 'Close', { duration: 3000 });
+            }
+            // this.notificationService.showError('Fout bij het aanmaken van de afspraak', 'Foutmelding Aanmaken Afspraak');
           }
         );
       } else {
@@ -380,7 +467,7 @@ export class AppointmentFormComponent implements OnInit {
           (error) => {
             console.error('Error creating appointment', error);
             this.snackBar.open('Error creating appointment', 'Close', { duration: 3000 });
-            this.notificationService.showError('Fout bij het aanmaken van de afspraak', 'Foutmelding Aanmaken Afspraak');
+            this.notificationService.showError('Er bestaat al een afspraak op dit tijdstip. Kies alstublieft een ander tijdstip.', 'Foutmelding Aanmaken Afspraak');
           }
         );
       }
@@ -408,5 +495,68 @@ export class AppointmentFormComponent implements OnInit {
   }
   removeReminder(index: number) {
     this.reminders.splice(index, 1);
+  }
+
+  loadAvailableTasks() {
+    this.taskService.getTasks().subscribe(
+      tasks => {
+        this.availableTasks = tasks
+        console.log('Available tasks:', this.availableTasks); // Voor debugging
+
+        // Filter out tasks that are already assigned to this appointment
+        if (this.isEditMode && this.appointment.taskIds) {
+          // this.availableTasks = this.availableTasks.filter(task => !this.appointment.taskIds.includes(task._id));
+          // Mark tasks that are already assigned to this appointment
+          this.availableTasks.forEach(task => {
+            task.isAssigned = this.appointment.taskIds.includes(task._id);
+          });
+        }
+        console.log('Available tasks after assignment check:', this.availableTasks); // Voor debugging
+
+      },
+      error => console.error('Error loading tasks', error)
+    );
+  }
+
+  assignTask_Old(taskId: string) {
+    const task = this.availableTasks.find(t => t._id === taskId);
+    if (task) {
+      task.appointmentId = this.appointment._id;
+      this.taskService.updateTask(task._id, task).subscribe(
+        () => this.loadAvailableTasks(),
+        error => console.error('Error assigning task', error)
+      );
+    }
+  }
+
+  assignTask(taskIds: string[]): void {
+    this.appointment.taskIds = taskIds;
+    console.log('Assigned tasks:', this.appointment.taskIds); // Voor debugging
+  }
+
+  getTaskTitle(taskId: string): string {
+    const task = this.availableTasks.find(t => t._id === taskId);
+    return task ? task.title : 'Onbekende taak';
+  }
+
+  removeTask(taskId: string): void {
+    this.appointment.taskIds = this.appointment.taskIds.filter((id: any) => id !== taskId);
+  }
+
+  canEditAppointment(appointment: any): boolean {
+    const currentUserId = this.authService.getCurrentUserId();
+    const partnerUserId = this.authService.getPartnerUserId();
+
+    console.log('Current User ID:', currentUserId);
+    console.log('Partner User ID:', partnerUserId);
+    console.log('Appointment:', appointment);
+
+    const canEdit = appointment.userId === currentUserId ||
+      (appointment.sharedWith && appointment.sharedWith.includes(currentUserId)) ||
+      appointment.userId === partnerUserId ||
+      (appointment.sharedWith && appointment.sharedWith.includes(partnerUserId));
+
+    console.log('Can Edit:', canEdit);
+    return canEdit;
   }
 }

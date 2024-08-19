@@ -77,4 +77,14 @@ export class AuthService {
     }
   }
 
+  getCurrentUserId(): string | null {
+    const currentUser = this.currentUserValue;
+    return currentUser && currentUser.result ? currentUser.result._id : null;
+  }
+
+  getPartnerUserId(): string | null {
+    const currentUser = this.currentUserValue;
+    return currentUser && currentUser.result && currentUser.result.partner ? currentUser.result.partner : null;
+  }
+
 }

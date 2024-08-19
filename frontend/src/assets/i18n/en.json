@@ -10,5 +10,8 @@
   "EMAIL": "Email",
   "PASSWORD": "Password",
   "CONFIRM_PASSWORD": "Confirm Password",
-  "INVITE": "Invite"
+  "INVITE": "Invite",
+  "TASKS": "Tasks",
+  "NO_TASKS": "No tasks assigned to this appointment.",
+  "NO_REMINDERS": "No reminders set for this appointment."
 }

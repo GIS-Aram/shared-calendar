@@ -22,7 +22,9 @@ const AppointmentSchema: Schema = new Schema({
             enum: ['email', 'push'], // of andere types die u wilt ondersteunen
             default: 'email'
         }
-    }]
+    }],
+    taskIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] // Zorg ervoor dat dit veld aanwezig is
+
 });
 
 // Create the model and explicitly specify the document interface and model interface
