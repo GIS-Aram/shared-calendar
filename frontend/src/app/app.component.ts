@@ -123,12 +123,12 @@ import { filter } from 'rxjs/operators';
       <mat-sidenav-container>
         <mat-sidenav #sidenav mode="over">
           <mat-nav-list>
-            <a *ngIf="!authService.isLoggedIn()" mat-list-item routerLink="/login" routerLinkActive="active">{{ 'LOGIN' | translate }}</a>
-            <a *ngIf="!authService.isLoggedIn()" mat-list-item routerLink="/register" routerLinkActive="active">{{ 'REGISTER' | translate }}</a>
-            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/calendar" routerLinkActive="active">{{ 'CALENDAR' | translate }}</a>
-            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/appointments" routerLinkActive="active">{{ 'APPOINTMENTS' | translate }}</a>
-            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/tasks" routerLinkActive="active">{{ 'TASKS' | translate }}</a>
-            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/invite-partner" routerLinkActive="active">{{ 'INVITE_PARTNER' | translate }}</a>
+            <a *ngIf="!authService.isLoggedIn()" mat-list-item routerLink="/login" routerLinkActive="active" (click)="closeNavAfterClick()">{{ 'LOGIN' | translate }}</a>
+            <a *ngIf="!authService.isLoggedIn()" mat-list-item routerLink="/register" routerLinkActive="active" (click)="closeNavAfterClick()">{{ 'REGISTER' | translate }}</a>
+            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/calendar" routerLinkActive="active" (click)="closeNavAfterClick()">{{ 'CALENDAR' | translate }}</a>
+            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/appointments" routerLinkActive="active" (click)="closeNavAfterClick()">{{ 'APPOINTMENTS' | translate }}</a>
+            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/tasks" routerLinkActive="active" (click)="closeNavAfterClick()">{{ 'TASKS' | translate }}</a>
+            <a *ngIf="authService.isLoggedIn()" mat-list-item routerLink="/invite-partner" routerLinkActive="active" (click)="closeNavAfterClick()">{{ 'INVITE_PARTNER' | translate }}</a>
             <a *ngIf="authService.isLoggedIn()" mat-list-item (click)="logout()" routerLinkActive="active">{{ 'LOGOUT' | translate }}</a>
           </mat-nav-list>
         </mat-sidenav>
@@ -220,5 +220,9 @@ export class AppComponent implements OnInit, OnDestroy {
         this.sidenav.close();
       }
     });
+  }
+
+  closeNavAfterClick() {
+    this.sidenav.close();
   }
 }

@@ -16,6 +16,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import {TaskService} from "../../services/task.service";
 import {MatChip, MatChipListbox, MatChipsModule} from "@angular/material/chips";
 import {AuthService} from "../../services/auth.service";
+import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
 
 @Component({
   selector: 'app-appointment-form',
@@ -33,7 +34,9 @@ import {AuthService} from "../../services/auth.service";
     MatIconModule,
     MatChip,
     MatChipsModule,
-    MatChipListbox
+    MatChipListbox,
+    MatDatepickerModule,
+    NgxMaterialTimepickerModule,
   ],
   animations: [
     trigger('fadeInOut', [
@@ -100,7 +103,12 @@ import {AuthService} from "../../services/auth.service";
 <!--          <mat-select [(ngModel)]="startTime" name="startTime" required #titleField="ngModel">-->
 <!--            <mat-option *ngFor="let time of timeOptions" [value]="time">{{time}}</mat-option>-->
 <!--          </mat-select>-->
-          <input matInput type="time" [(ngModel)]="startTime" name="startTime" (ngModelChange)="onStartTimeChange()" required>
+
+
+          <input matInput [ngxTimepicker]="startPicker" [(ngModel)]="startTime" name="startTime" (ngModelChange)="onStartTimeChange()" [format]="24" readonly required>
+          <mat-icon matSuffix (click)="startPicker.open()">access_time</mat-icon>
+          <ngx-material-timepicker #startPicker></ngx-material-timepicker>
+<!--          <input matInput type="time" [(ngModel)]="startTime" name="startTime" (ngModelChange)="onStartTimeChange()" required>-->
           <mat-error *ngIf="titleField.invalid && (titleField.dirty || titleField.touched)">
             Starttijd is verplicht
           </mat-error>
@@ -134,7 +142,12 @@ import {AuthService} from "../../services/auth.service";
 <!--          <mat-select [(ngModel)]="endTime" name="endTime" required #titleField="ngModel">-->
 <!--            <mat-option *ngFor="let time of timeOptions" [value]="time">{{time}}</mat-option>-->
 <!--          </mat-select>-->
-          <input matInput type="time" [(ngModel)]="endTime" name="endTime" required>
+
+
+          <input matInput [ngxTimepicker]="endPicker" [(ngModel)]="endTime" name="endTime" [format]="24" readonly required>
+          <mat-icon matSuffix (click)="endPicker.open()">access_time</mat-icon>
+          <ngx-material-timepicker #endPicker></ngx-material-timepicker>
+<!--          <input matInput type="time" [(ngModel)]="endTime" name="endTime" required>-->
           <mat-error *ngIf="titleField.invalid && (titleField.dirty || titleField.touched)">
             Eindtijd is verplicht
           </mat-error>
