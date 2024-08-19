@@ -1,27 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild, AfterViewInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions, EventClickArg, DateSelectArg } from '@fullcalendar/core';
+import {FullCalendarComponent, FullCalendarModule} from '@fullcalendar/angular';
+import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
 import nlLocale from '@fullcalendar/core/locales/nl';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
+import interactionPlugin, {DateClickArg} from '@fullcalendar/interaction';
 import { AppointmentService } from '../../services/appointment.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import timeGridPlugin from '@fullcalendar/timegrid';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-calendar',
   standalone: true,
-  imports: [CommonModule, FullCalendarModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, FullCalendarModule, MatButtonModule, MatIconModule, DragDropModule],
   template: `
     <div class="calendar-container">
       <h2>Shared Calendar</h2>
-      <full-calendar [options]="calendarOptions"></full-calendar>
+      <full-calendar #calendar [options]="calendarOptions"></full-calendar>
     </div>
-    <button mat-fab color="primary" class="add-appointment-button" (click)="addAppointment()">
+    <button mat-fab color="primary" class="add-appointment-button" cdkDragBoundary="body" cdkDrag (click)="addAppointment($event)">
       <mat-icon>add</mat-icon>
     </button>
   `,
@@ -71,6 +72,10 @@ import timeGridPlugin from '@fullcalendar/timegrid';
       h2 {
         font-size: 1.2rem;
         margin-bottom: 10px;
+      }
+      .add-appointment-button {
+        bottom: 20px;
+        right: 20px;
       }
       ::ng-deep .fc-toolbar {
         flex-direction: column;
@@ -141,7 +146,9 @@ import timeGridPlugin from '@fullcalendar/timegrid';
   // `]
 
 })
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, AfterViewInit {
+  @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
+
   calendarOptions_Werkend: CalendarOptions = {
     plugins: [dayGridPlugin, interactionPlugin],
     initialView: 'dayGridMonth',
@@ -156,8 +163,8 @@ export class CalendarComponent implements OnInit {
     selectMirror: true,
     dayMaxEvents: true,
     events: [],
-    eventClick: this.handleEventClick.bind(this),
-    select: this.handleDateSelect.bind(this)
+    // eventClick: this.handleEventClick.bind(this),
+    // select: this.handleDateSelect.bind(this)
   };
   calendarOptions: CalendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -170,7 +177,7 @@ export class CalendarComponent implements OnInit {
     },
     weekends: true,
     editable: true,
-    selectable: true,
+    selectable: false,
     selectMirror: true,
     dayMaxEvents: true,
     events: [],
@@ -184,7 +191,7 @@ export class CalendarComponent implements OnInit {
     scrollTime: '08:00:00', // Tijd waarop de agenda begint te scrollen:Scroll naar 8:00 AM bij het laden van de agenda
 
     eventClick: this.handleEventClick.bind(this),
-    select: this.handleDateSelect.bind(this),
+    dateClick: this.handleDateClick.bind(this),
     height: 'auto',
     aspectRatio: 1.35,
     eventTimeFormat: {
@@ -212,6 +219,10 @@ export class CalendarComponent implements OnInit {
     this.adjustCalendarForMobile();
   }
 
+  ngAfterViewInit() {
+    this.updateCalendarOptions();
+  }
+
   loadAppointments() {
     this.appointmentService.getAppointments().subscribe(
       (appointments) => {
@@ -222,6 +233,7 @@ export class CalendarComponent implements OnInit {
           end: new Date(appointment.endTime)
         }));
         this.calendarOptions.events = events;
+        this.updateCalendarOptions();
       },
       (error) => {
         console.error('Error loading appointments', error);
@@ -246,16 +258,29 @@ export class CalendarComponent implements OnInit {
     this.router.navigate(['/appointment/edit', appointmentId]);
   }
 
-  handleDateSelect(selectInfo: DateSelectArg) {
+  handleDateClick(arg: DateClickArg) {
+    const clickedDate = arg.date;
+    const endDate = new Date(clickedDate);
+    endDate.setDate(endDate.getDate() + 1);
+
     this.router.navigate(['/appointment/new'], {
       queryParams: {
-        start: selectInfo.startStr,
-        end: selectInfo.endStr
+        start: clickedDate.toISOString(),
+        end: endDate.toISOString()
       }
     });
   }
 
-  addAppointment() {
+  addAppointment(event: MouseEvent) {
+    event.stopPropagation(); // Voorkom dat de klik doorgaat naar de onderliggende kalender
     this.router.navigate(['/appointment/new']);
+  }
+
+  private updateCalendarOptions() {
+    if (this.calendarComponent && this.calendarComponent.getApi()) {
+      const calendarApi = this.calendarComponent.getApi();
+      calendarApi.removeAllEventSources();
+      calendarApi.addEventSource(this.calendarOptions.events || []);
+    }
   }
 }
