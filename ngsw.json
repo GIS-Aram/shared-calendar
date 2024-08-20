@@ -1,0 +1,103 @@
+{
+  "configVersion": 1,
+  "timestamp": 1724172432520,
+  "index": "/shared-calendar/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/shared-calendar/favicon.ico",
+        "/shared-calendar/index.html",
+        "/shared-calendar/main-JXPLKVEN.js",
+        "/shared-calendar/manifest.webmanifest",
+        "/shared-calendar/polyfills-SCHOHYNV.js",
+        "/shared-calendar/scripts-EEEIPNC3.js",
+        "/shared-calendar/styles-OCUERSAQ.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/shared-calendar/assets/flags/en-big.png",
+        "/shared-calendar/assets/flags/en-heel-klein.png",
+        "/shared-calendar/assets/flags/en-klein.png",
+        "/shared-calendar/assets/flags/en-used.png",
+        "/shared-calendar/assets/flags/en.png",
+        "/shared-calendar/assets/flags/nl-big.png",
+        "/shared-calendar/assets/flags/nl.png",
+        "/shared-calendar/assets/i18n/en.json",
+        "/shared-calendar/assets/i18n/nl.json",
+        "/shared-calendar/assets/icons/icon-128x128.png",
+        "/shared-calendar/assets/icons/icon-144x144.png",
+        "/shared-calendar/assets/icons/icon-152x152.png",
+        "/shared-calendar/assets/icons/icon-192x192.png",
+        "/shared-calendar/assets/icons/icon-384x384.png",
+        "/shared-calendar/assets/icons/icon-512x512.png",
+        "/shared-calendar/assets/icons/icon-72x72.png",
+        "/shared-calendar/assets/icons/icon-96x96.png",
+        "/shared-calendar/assets/icons/shared-calendar.png",
+        "/shared-calendar/assets/shared-calendar.ico"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/shared-calendar/assets/flags/en-big.png": "6495d0a202721472461a53b11c79aea953184a7c",
+    "/shared-calendar/assets/flags/en-heel-klein.png": "c25c8a4965eaa4f6ad5f195d7a8c99171872a06f",
+    "/shared-calendar/assets/flags/en-klein.png": "7f2612902c7d862f530196c90bffb89b6460eb7f",
+    "/shared-calendar/assets/flags/en-used.png": "b8c3380dd5a5243098bbc6c99b309f549f6e99e4",
+    "/shared-calendar/assets/flags/en.png": "ad2c7c1e34a8d3ab32ca36119f954b9923d2a3c0",
+    "/shared-calendar/assets/flags/nl-big.png": "fa9aff4287d95fdc1dfc72ec5251c9510c9d28e6",
+    "/shared-calendar/assets/flags/nl.png": "75611ec70af5efaffb7e4fcd8019078077d4aebd",
+    "/shared-calendar/assets/i18n/en.json": "4a1654c6494764b175ffcc1b74e612424d834942",
+    "/shared-calendar/assets/i18n/nl.json": "c5bc447b1ce37a6682a8048245a9a195999fa3ed",
+    "/shared-calendar/assets/icons/icon-128x128.png": "88686ab37d16840344c19cda6b9d2cc48deb79f6",
+    "/shared-calendar/assets/icons/icon-144x144.png": "036741ed1e1e94fbb01833301ae3df5e593447ac",
+    "/shared-calendar/assets/icons/icon-152x152.png": "654a46b06b9498fc426b6ba55ab15abf54d5b472",
+    "/shared-calendar/assets/icons/icon-192x192.png": "63dd6f5b35c7751ea7f44bee9bcd503fcd57f332",
+    "/shared-calendar/assets/icons/icon-384x384.png": "56dc13d17bb1ae3ebdb256b28e2bc27a0414e5e9",
+    "/shared-calendar/assets/icons/icon-512x512.png": "4428d4523c8579b9d51135bc2f6b02c3a83b2a53",
+    "/shared-calendar/assets/icons/icon-72x72.png": "3b9ed27fed71cd0f0f0bd7995d6e7da205b14106",
+    "/shared-calendar/assets/icons/icon-96x96.png": "749ad57dc7ec839db36151229e89345c51dae11b",
+    "/shared-calendar/assets/icons/shared-calendar.png": "accf3df0f12202926c018954501474333a816ff5",
+    "/shared-calendar/assets/shared-calendar.ico": "35ee92474ec716d38c40f7c69fd2708df13864ad",
+    "/shared-calendar/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
+    "/shared-calendar/index.html": "9cae4cb8f1cb4ee42024ac36d6205fb51fc31db7",
+    "/shared-calendar/main-JXPLKVEN.js": "86ef4466784d217096d1379a1724d812119fedbe",
+    "/shared-calendar/manifest.webmanifest": "63b272452f7323ec09705c84044faa394ce82a79",
+    "/shared-calendar/polyfills-SCHOHYNV.js": "d45c76c5960bab3ace7fd6d211b9579456241f8a",
+    "/shared-calendar/scripts-EEEIPNC3.js": "2318ded8c885787a1645385a82c1ca883c359034",
+    "/shared-calendar/styles-OCUERSAQ.css": "0f3b3069ff1511b383eb3ad3764ea672f45ab4ae"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
