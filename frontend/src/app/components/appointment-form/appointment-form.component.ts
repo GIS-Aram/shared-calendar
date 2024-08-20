@@ -17,6 +17,13 @@ import {TaskService} from "../../services/task.service";
 import {MatChip, MatChipListbox, MatChipsModule} from "@angular/material/chips";
 import {AuthService} from "../../services/auth.service";
 import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
+import {MatExpansionModule} from "@angular/material/expansion";
+import {MatCheckboxModule} from "@angular/material/checkbox";
+import {MatRadioModule} from "@angular/material/radio";
+import {MatDialogModule} from "@angular/material/dialog";
+import {catchError, finalize} from "rxjs";
+import {MatListModule} from "@angular/material/list";
+import {TranslateModule} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-appointment-form',
@@ -37,6 +44,12 @@ import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
     MatChipListbox,
     MatDatepickerModule,
     NgxMaterialTimepickerModule,
+    MatExpansionModule,
+    MatCheckboxModule,
+    MatRadioModule,
+    MatDialogModule,
+    MatListModule,
+    TranslateModule
   ],
   animations: [
     trigger('fadeInOut', [
@@ -51,19 +64,19 @@ import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
   ],
   template: `
     <div class="appointment-form">
-      <h2>{{isEditMode ? 'Edit' : 'Create'}} Appointment</h2>
+      <h2>{{ "APPOINTMENT" | translate }} {{isEditMode ? ('EDIT' | translate) : ('CREATE' | translate) }}</h2>
       <form #appointmentForm="ngForm" (ngSubmit)="onSubmit(appointmentForm)">
 
       <mat-form-field>
-          <mat-label>Title</mat-label>
+          <mat-label>{{'TITLE' | translate}}</mat-label>
           <input matInput [(ngModel)]="appointment.title" name="title" required #titleField="ngModel">
           <mat-error *ngIf="titleField.invalid && (titleField.dirty || titleField.touched)">
-            Titel is verplicht
+            {{ "TITLE_REQUIRED" | translate }}
           </mat-error>
         </mat-form-field>
 
         <mat-form-field>
-          <mat-label>Description</mat-label>
+          <mat-label>{{'DESCRIPTION' | translate}}</mat-label>
           <textarea matInput [(ngModel)]="appointment.description" name="description" #titleField="ngModel"></textarea>
           <mat-error *ngIf="titleField.invalid && (titleField.dirty || titleField.touched)">
             Beschrijving is optioneel
@@ -71,7 +84,7 @@ import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
         </mat-form-field>
 
         <mat-form-field>
-          <mat-label>Start Date</mat-label>
+          <mat-label>{{'START_DATE' | translate}}</mat-label>
           <input matInput [matDatepicker]="startDatePicker" [(ngModel)]="startDate" name="startDate" required #titleField="ngModel">
           <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #startDatePicker></mat-datepicker>
@@ -99,7 +112,7 @@ import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
 <!--          </mat-select>-->
 <!--        </mat-form-field>-->
         <mat-form-field>
-          <mat-label>Start Tijd</mat-label>
+          <mat-label>{{'START_TIME' | translate}}</mat-label>
 <!--          <mat-select [(ngModel)]="startTime" name="startTime" required #titleField="ngModel">-->
 <!--            <mat-option *ngFor="let time of timeOptions" [value]="time">{{time}}</mat-option>-->
 <!--          </mat-select>-->
@@ -115,7 +128,7 @@ import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
         </mat-form-field>
 
         <mat-form-field>
-          <mat-label>End Date</mat-label>
+          <mat-label>{{'END_DATE' | translate}}</mat-label>
           <input matInput [matDatepicker]="endDatePicker" [(ngModel)]="endDate" name="endDate" required #titleField="ngModel">
           <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
           <mat-datepicker #endDatePicker></mat-datepicker>
@@ -138,7 +151,7 @@ import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
 <!--          </mat-select>-->
 <!--        </mat-form-field>-->
         <mat-form-field>
-          <mat-label>Eind Tijd</mat-label>
+          <mat-label>{{'END_TIME' | translate}}</mat-label>
 <!--          <mat-select [(ngModel)]="endTime" name="endTime" required #titleField="ngModel">-->
 <!--            <mat-option *ngFor="let time of timeOptions" [value]="time">{{time}}</mat-option>-->
 <!--          </mat-select>-->
@@ -234,8 +247,110 @@ import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
           </mat-chip-listbox>
         </div>
 
+
+        <!-- Recurring appointment section -->
+        <mat-expansion-panel class="mb-3">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{'RECURRING_APPOINTMENT' | translate}}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <mat-checkbox [(ngModel)]="isRecurring" name="isRecurring" (change)="updateRecurringPreview()">{{'MAKE_RECURRING_APPOINTMENT' | translate}}</mat-checkbox>
+
+          <mat-form-field *ngIf="isRecurring">
+            <mat-label>{{'REPEAT' | translate}}</mat-label>
+            <mat-select [(ngModel)]="recurringPattern" name="recurringPattern" (selectionChange)="updateRecurringPreview()">
+              <mat-option value="daily">{{'DAILY' | translate}}</mat-option>
+              <mat-option value="weekly">{{'WEEKLY' | translate}}</mat-option>
+              <mat-option value="monthly">{{'MONTHLY' | translate}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-radio-group *ngIf="isRecurring" [(ngModel)]="recurringEndType" name="recurringEndType" (change)="updateRecurringPreview()">
+            <mat-radio-button value="date">{{'END_BY_DATE' | translate}}</mat-radio-button>
+            <mat-radio-button value="count">{{'END_AFTER_OCCURRENCES' | translate}}</mat-radio-button>
+          </mat-radio-group>
+
+          <mat-form-field *ngIf="isRecurring && recurringEndType === 'date'">
+            <mat-label>{{'END_DATE' | translate}}</mat-label>
+            <input matInput [matDatepicker]="recurringEndPicker" [(ngModel)]="recurringEndDate" name="recurringEndDate" (dateChange)="updateRecurringPreview()">
+            <mat-datepicker-toggle matSuffix [for]="recurringEndPicker"></mat-datepicker-toggle>
+            <mat-datepicker #recurringEndPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field *ngIf="isRecurring && recurringEndType === 'count'">
+            <mat-label>{{'NUMBER_OF_OCCURRENCES' | translate}}</mat-label>
+            <input matInput type="number" [(ngModel)]="recurringCount" name="recurringCount" min="1" (change)="updateRecurringPreview()">
+          </mat-form-field>
+        </mat-expansion-panel>
+
+        <!-- Exceptions -->
+        <mat-expansion-panel *ngIf="isRecurring" class="mb-3">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{'EXCEPTIONS' | translate}}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <mat-form-field>
+            <mat-label>{{'ADD_EXCEPTION_DATE' | translate}}</mat-label>
+            <input matInput [matDatepicker]="exceptionPicker" [(ngModel)]="newException" name="newException">
+            <mat-datepicker-toggle matSuffix [for]="exceptionPicker"></mat-datepicker-toggle>
+            <mat-datepicker #exceptionPicker></mat-datepicker>
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="addException($event)">{{'ADD_EXCEPTION' | translate}}</button>
+
+          <mat-list *ngIf="exceptions.length > 0">
+            <mat-list-item *ngFor="let exception of exceptions">
+              {{exception | date:'mediumDate'}}
+              <button mat-icon-button color="warn" (click)="removeException($event, exception)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-list-item>
+          </mat-list>
+        </mat-expansion-panel>
+
+        <!-- Preview of recurring dates -->
+        <div *ngIf="isRecurring && recurringDates.length > 0" class="recurring-preview">
+          <h3>{{'RECURRING_DATES_PREVIEW' | translate}}</h3>
+          <ul>
+            <li *ngFor="let date of recurringDates.slice(0, showAllDates ? recurringDates.length : 5)">
+              {{date | date:'medium'}}
+              <button mat-icon-button color="warn" (click)="addException($event, date)">
+                <mat-icon>remove_circle</mat-icon>
+              </button>
+            </li>
+          </ul>
+          <p *ngIf="recurringDates.length > 5 && !showAllDates" (click)="toggleShowAllDates($event)">
+            <button mat-button (click)="toggleShowAllDates($event)">
+                {{'AND' | translate}} {{recurringDates.length - 5}} {{'MORE' | translate}}
+<!--            <mat-icon>expand_more</mat-icon> class="clickable-text"-->
+            </button>
+          </p>
+          <p *ngIf="showAllDates" (click)="toggleShowAllDates($event)">
+            <button mat-button (click)="toggleShowAllDates($event)">
+                {{'SHOW_LESS' | translate}}
+<!--            <mat-icon>expand_less</mat-icon>-->
+            </button>
+          </p>
+        </div>
+
+        <!-- Exceptions -->
+        <div *ngIf="exceptions.length > 0" class="exceptions">
+          <h3>{{'ADDED_EXCEPTIONS' | translate}}</h3>
+          <mat-chip-listbox>
+            <mat-chip *ngFor="let exception of exceptions" removable (removed)="removeException(null, exception)">
+              {{exception | date:'mediumDate'}}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+          </mat-chip-listbox>
+        </div>
+
+
+        <!-- Submit button -->
         <button mat-raised-button color="primary" type="submit" [disabled]="!appointmentForm.form.valid || (isEditMode && !canEditAppointment(appointment))">
-          {{isEditMode ? 'Update' : 'Create'}}
+          {{isEditMode ? ('UPDATE' | translate) : ('CREATE' | translate)}}
         </button>
         <button mat-button type="button" (click)="goBack()">Annuleren</button>
       </form>
@@ -251,6 +366,25 @@ import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
       width: 100%;
       margin-bottom: 20px;
       display: block;
+    }
+    .recurring-preview, .exceptions {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+    }
+    .recurring-preview ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .recurring-preview li {
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    mat-chip-list {
+      margin-top: 10px;
     }
 
     /* herinneringsfunctionaliteit  */
@@ -301,6 +435,24 @@ import {NgxMaterialTimepickerModule} from "ngx-material-timepicker";
       margin-bottom: 8px;
     }
 
+    /* Herhaalde afspraken */
+    .clickable-text {
+      color: #007bff; /* Professionele blauwe kleur */
+      text-decoration: underline; /* Onderstreept om klikbaarheid aan te duiden */
+      cursor: pointer; /* Pointer-cursor bij hover */
+      font-weight: 500; /* Iets dikkere tekst om het te benadrukken */
+      transition: color 0.3s ease; /* Zachte overgang bij hover */
+    }
+    .clickable-text:hover {
+      color: #0056b3; /* Donkerdere kleur bij hover voor visuele feedback */
+    }
+    /* Optional: Customize the material button appearance */
+    .mat-button {
+      text-transform: none; /* Disable uppercase transformation */
+      padding: 0; /* Remove padding for a cleaner look */
+      min-width: unset; /* Remove the minimum width constraint */
+    }
+
   `]
 })
 export class AppointmentFormComponent implements OnInit {
@@ -321,6 +473,17 @@ export class AppointmentFormComponent implements OnInit {
   endTime: string = '00:00';
   reminders: { time: number, type: string }[] = [];
   availableTasks: any[] = [];
+
+  isRecurring: boolean = false;
+  recurringPattern: 'daily' | 'weekly' | 'monthly' = 'weekly';
+  recurringEndType: 'date' | 'count' = 'date';
+  recurringEndDate: Date | null = null;
+  recurringCount: number = 1;
+  recurringDates: Date[] = [];
+  exceptions: Date[] = [];
+  newException: Date | null = null;
+  isSubmitting: boolean = false;
+  showAllDates: boolean = false;
 
   constructor(
     private appointmentService: AppointmentService,
@@ -356,6 +519,7 @@ export class AppointmentFormComponent implements OnInit {
     }
 
     this.loadAvailableTasks();
+    this.updateRecurringPreview();
   }
 
   generateTimeOptions() {
@@ -425,7 +589,7 @@ export class AppointmentFormComponent implements OnInit {
   }
 
 
-  onSubmit(form: NgForm) {
+  onSubmit_Werkend(form: NgForm) {
     // if (!this.startDate || !this.endDate) {
     //   this.snackBar.open('Please select both start and end dates', 'Close', { duration: 3000 });
     //   return;
@@ -489,6 +653,136 @@ export class AppointmentFormComponent implements OnInit {
       this.notificationService.showInfo('Vul alstublieft alle verplichte velden in', 'Velden Invullen');
     }
 
+  }
+  onSubmit(form: NgForm) {
+    if (form.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
+      if (this.isRecurring) {
+        this.createRecurringAppointments();
+      } else {
+        this.createSingleAppointment();
+      }
+    } else {
+      this.snackBar.open('Please fill in all required fields', 'Close', { duration: 3000 });
+    }
+  }
+
+  createRecurringAppointments() {
+    const appointments = this.generateRecurringAppointments();
+
+    this.appointmentService.createAppointments(appointments).pipe(
+      catchError(error => {
+        console.error('Error creating recurring appointments', error);
+        this.notificationService.showError('Error creating recurring appointments', 'Error');
+        return [];
+      }),
+      finalize(() => this.isSubmitting = false)
+    ).subscribe(
+      (createdAppointments: any) => {
+        if (createdAppointments.length > 0) {
+          this.notificationService.showSuccess(`Created ${createdAppointments.length} recurring appointments successfully`, 'Success');
+          this.router.navigate(['/calendar']);
+        }
+      }
+    );
+  }
+
+  createSingleAppointment() {
+    this.appointment.startTime = this.combineDateAndTime(this.startDate!, this.startTime);
+    this.appointment.endTime = this.combineDateAndTime(this.endDate!, this.endTime);
+
+    if (this.isEditMode) {
+      this.appointmentService.updateAppointment(this.appointment._id, this.appointment).pipe(
+        finalize(() => this.isSubmitting = false)
+      ).subscribe(
+        () => {
+          this.notificationService.showSuccess('Appointment updated successfully', 'Success');
+          this.router.navigate(['/calendar']);
+        },
+        (error) => {
+          console.error('Error updating appointment', error);
+          this.notificationService.showError('Error updating appointment', 'Error');
+        }
+      );
+    } else {
+      this.appointmentService.createAppointment(this.appointment).pipe(
+        finalize(() => this.isSubmitting = false)
+      ).subscribe(
+        () => {
+          this.notificationService.showSuccess('Appointment created successfully', 'Success');
+          this.router.navigate(['/calendar']);
+        },
+        (error) => {
+          console.error('Error creating appointment', error);
+          this.notificationService.showError('Error creating appointment', 'Error');
+        }
+      );
+    }
+  }
+
+  generateRecurringAppointments(): any[] {
+    const appointments = [];
+    let currentDate = new Date(this.startDate!);
+    const endDate = this.recurringEndType === 'date' ? new Date(this.recurringEndDate!) : null;
+    let count = 0;
+
+    while (
+      (this.recurringEndType === 'date' && currentDate <= endDate!) ||
+      (this.recurringEndType === 'count' && count < this.recurringCount)
+      ) {
+      if (!this.isDateException(currentDate)) {
+        const appointment = { ...this.appointment };
+        appointment.startTime = this.combineDateAndTime(currentDate, this.startTime);
+        appointment.endTime = this.combineDateAndTime(currentDate, this.endTime);
+        appointments.push(appointment);
+      }
+
+      switch (this.recurringPattern) {
+        case 'daily':
+          currentDate.setDate(currentDate.getDate() + 1);
+          break;
+        case 'weekly':
+          currentDate.setDate(currentDate.getDate() + 7);
+          break;
+        case 'monthly':
+          currentDate.setMonth(currentDate.getMonth() + 1);
+          break;
+      }
+
+      count++;
+    }
+
+    return appointments;
+  }
+
+  updateRecurringPreview() {
+    this.recurringDates = this.generateRecurringAppointments().map(app => new Date(app.startTime));
+  }
+
+  addException(event?: Event, date?: Date) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    if (date) {
+      this.exceptions.push(new Date(date));
+    } else if (this.newException) {
+      this.exceptions.push(new Date(this.newException));
+      this.newException = null;
+    }
+    this.updateRecurringPreview();
+  }
+
+  removeException(event: Event | null, date: Date) {
+    event?.preventDefault();
+    event?.stopPropagation();
+    this.exceptions = this.exceptions.filter(d => d.getTime() !== date.getTime());
+    this.updateRecurringPreview();
+  }
+
+  isDateException(date: Date): boolean {
+    return this.exceptions.some(d => d.toDateString() === date.toDateString());
   }
 
   combineDateAndTime(date: Date, time: string): Date {
@@ -571,5 +865,11 @@ export class AppointmentFormComponent implements OnInit {
 
     console.log('Can Edit:', canEdit);
     return canEdit;
+  }
+
+  toggleShowAllDates(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.showAllDates = !this.showAllDates;
   }
 }

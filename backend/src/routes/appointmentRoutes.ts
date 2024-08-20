@@ -6,7 +6,7 @@ import {
     getAppointments,
     getAppointmentById,
     updateAppointment,
-    deleteAppointment
+    deleteAppointment, createAppointments
 } from '../controllers/appointmentController';
 import auth from '../middleware/auth';
 
@@ -28,5 +28,7 @@ router.put('/:id', auth, updateAppointment);
 
 // DELETE /api/appointments/:id
 router.delete('/:id', auth, deleteAppointment);
+
+router.post('/bulk', auth, createAppointments);
 
 export default router;

@@ -9,6 +9,8 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatDialogModule } from "@angular/material/dialog";
 import {MatCheckbox, MatCheckboxModule} from "@angular/material/checkbox";
 import {MatIcon, MatIconModule} from "@angular/material/icon";
+import {animate, style, transition, trigger} from "@angular/animations";
+import {TranslateModule} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-task-form',
@@ -24,23 +26,35 @@ import {MatIcon, MatIconModule} from "@angular/material/icon";
     MatCheckbox,
     MatIcon,
     MatCheckboxModule,
-    MatIconModule
+    MatIconModule,
+    TranslateModule
+  ],
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('600ms ease-in', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('600ms ease-out', style({ opacity: 0 }))
+      ])
+    ])
   ],
   template: `
     <h2 mat-dialog-title>{{ task._id ? 'Bewerk Taak' : 'Nieuwe Taak' }}</h2>
     <mat-dialog-content>
       <form (ngSubmit)="onSubmit()" #taskForm="ngForm">
         <mat-form-field appearance="fill">
-          <mat-label>Titel</mat-label>
-          <input matInput [(ngModel)]="task.title" name="title" required>
+          <mat-label>{{'TITLE' | translate}}</mat-label>
+          <input matInput [(ngModel)]="stagingTask.title" name="title" required>
         </mat-form-field>
         <mat-form-field appearance="fill">
-          <mat-label>Beschrijving</mat-label>
-          <textarea matInput [(ngModel)]="task.description" name="description" rows="3"></textarea>
+          <mat-label>{{'DESCRIPTION' | translate}}</mat-label>
+          <textarea matInput [(ngModel)]="stagingTask.description" name="description" rows="3"></textarea>
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Einddatum</mat-label>
-          <input matInput [matDatepicker]="picker" [(ngModel)]="task.dueDate" name="dueDate">
+          <input matInput [matDatepicker]="picker" [(ngModel)]="stagingTask.dueDate" name="dueDate">
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
@@ -60,7 +74,7 @@ import {MatIcon, MatIconModule} from "@angular/material/icon";
 <!--        <button mat-button (click)="addAction()">Actiepunt toevoegen</button>-->
 
         <h3>Actiepunten</h3>
-        <div *ngFor="let action of task.actions; let i = index">
+        <div *ngFor="let action of stagingTask.actions; let i = index">
           <mat-checkbox [(ngModel)]="action.completed" name="action{{i}}">
             {{ action.description }}
           </mat-checkbox>
@@ -71,12 +85,18 @@ import {MatIcon, MatIconModule} from "@angular/material/icon";
         <mat-form-field>
           <input matInput [(ngModel)]="newAction" placeholder="Nieuw actiepunt" name="newAction">
         </mat-form-field>
-        <button mat-button (click)="addAction($event)">Actiepunt toevoegen</button>
+        <button class="btn bg-primary btn-font-color" mat-button (click)="addAction($event)">
+          {{stagingTask.actions && stagingTask.actions.length ? 'Voeg nog een actiepunt toe' : 'Actiepunt toevoegen' }}
+        </button>
+
+        <div *ngIf="stagingTask.actions.length === 0" class="no-actions" @fadeInOut>
+          Er zijn geen actiepunten toegevoegd aan deze taak.
+        </div>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button (click)="onNoClick()">Annuleren</button>
-      <button mat-raised-button color="primary" [mat-dialog-close]="task" [disabled]="!taskForm.form.valid">
+      <button mat-raised-button color="primary" [mat-dialog-close]="stagingTask" [disabled]="!taskForm.form.valid">
         {{ task._id ? 'Bijwerken' : 'Toevoegen' }}
       </button>
     </mat-dialog-actions>
@@ -89,20 +109,38 @@ import {MatIcon, MatIconModule} from "@angular/material/icon";
     textarea {
       min-height: 100px;
     }
+    .btn-font-color {
+      color: white;
+    }
+    .no-actions {
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin-top: 20px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
   `]
 })
 export class TaskFormComponent implements OnInit {
   task: any = {};
   newAction: string = '';
+  stagingTask: any = {}; // Gebruik een aparte stagingTask voor tijdelijke wijzigingen
 
   constructor(public dialogRef: MatDialogRef<TaskFormComponent>,
               @Inject(MAT_DIALOG_DATA) public data: any) {}
 
   ngOnInit() {
     if (this.data) {
+      // Werk met stagingTask voor bewerken en terugzetten
+      this.stagingTask = JSON.parse(JSON.stringify(this.data));
+
       this.task = {...this.data};
-      if (!this.task.actions) {
-        this.task.actions = [];
+      if (!this.stagingTask.actions) {
+        this.stagingTask.actions = [];
       }
     }
   }
@@ -112,9 +150,9 @@ export class TaskFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.task.title) {
-      // Zorg ervoor dat de actiepunten correct worden toegevoegd aan de taak
-      this.task.actions = this.task.actions || [];
+    if (this.stagingTask.title) {
+      // Pas de wijzigingen toe van stagingTask naar task bij bevestiging
+      this.task = JSON.parse(JSON.stringify(this.stagingTask));
 
       this.dialogRef.close(this.task);
     }
@@ -124,15 +162,15 @@ export class TaskFormComponent implements OnInit {
     event.preventDefault(); // Voorkom dat het formulier wordt verzonden
 
     if (this.newAction.trim()) {
-      if (!this.task.actions) {
-        this.task.actions = [];
+      if (!this.stagingTask.actions) {
+        this.stagingTask.actions = [];
       }
-      this.task.actions.push({ description: this.newAction, completed: false });
+      this.stagingTask.actions.push({ description: this.newAction, completed: false });
       this.newAction = '';
     }
   }
 
   removeAction(index: number): void {
-    this.task.actions.splice(index, 1);
+    this.stagingTask.actions.splice(index, 1);
   }
 }

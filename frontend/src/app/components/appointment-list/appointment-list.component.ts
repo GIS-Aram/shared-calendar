@@ -49,11 +49,11 @@ import {TranslateModule} from "@ngx-translate/core";
         </mat-expansion-panel-header>
         <div class="search-filters filter-container">
           <mat-form-field appearance="fill">
-            <mat-label>Search by title</mat-label>
+            <mat-label>{{'SEARCH_BY_TITLE' | translate}}</mat-label>
             <input matInput [(ngModel)]="searchKeyword" placeholder="Enter a keyword" (keyup)="applyFilters()" />
           </mat-form-field>
           <mat-form-field appearance="fill">
-            <mat-label>Filter by date</mat-label>
+            <mat-label>{{'FILTER_BY_DATE' | translate}}</mat-label>
   <!--          <input matInput [(ngModel)]="selectedDate" placeholder="Choose a date" (change)="applyFilters()" type="date" />-->
             <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" placeholder="Choose a date" (dateChange)="applyFilters()" />
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
@@ -66,7 +66,7 @@ import {TranslateModule} from "@ngx-translate/core";
   <!--          </mat-select>-->
   <!--        </mat-form-field>-->
           <mat-form-field appearance="fill">
-            <mat-label>Filter by status</mat-label>
+            <mat-label>{{'FILTER_BY_STATUS' | translate}}</mat-label>
             <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilters()">
               <mat-option value="all">Alle afspraken</mat-option>
               <mat-option value="past">Verlopen afspraken</mat-option>
@@ -104,22 +104,22 @@ import {TranslateModule} from "@ngx-translate/core";
       <div class="table-container hide-on-mobile">
         <table *ngIf="filteredAppointments" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 custom-table mt-3">
           <ng-container matColumnDef="title">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Title </th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'TITLE' | translate}} </th>
             <td mat-cell *matCellDef="let appointment"> {{appointment.title}} </td>
           </ng-container>
 
           <ng-container matColumnDef="startTime">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Start Time </th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'START_DATE' | translate}} </th>
             <td mat-cell *matCellDef="let appointment"> {{appointment.startTime | date:'short'}} </td>
           </ng-container>
 
           <ng-container matColumnDef="endTime">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> End Time </th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{'END_DATE' | translate}} </th>
             <td mat-cell *matCellDef="let appointment"> {{appointment.endTime | date:'short'}} </td>
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <th mat-header-cell *matHeaderCellDef> {{'ACTIONS' | translate}} </th>
             <td mat-cell *matCellDef="let appointment">
               <button mat-icon-button color="primary" (click)="viewAppointment(appointment._id)">
                 <mat-icon>visibility</mat-icon>

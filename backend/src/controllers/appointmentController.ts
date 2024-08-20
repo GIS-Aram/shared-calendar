@@ -309,3 +309,57 @@ export const deleteAppointment = async (req: Request, res: Response) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+export const createAppointments = async (req: Request, res: Response) => {
+    try {
+        const appointments = req.body;
+
+        // Voeg userId toe aan elke afspraak
+        const appointmentsWithUserId = appointments.map((appointment: any) => ({
+            ...appointment,
+            userId: req.userId
+        }));
+
+        // Check for overlapping appointments
+        for (let appointment of appointmentsWithUserId) {
+            const overlappingAppointment = await Appointment.findOne({
+                userId: req.userId,
+                $or: [
+                    { startTime: { $lt: appointment.endTime }, endTime: { $gt: appointment.startTime } },
+                    { startTime: { $gte: appointment.startTime, $lt: appointment.endTime } },
+                    { endTime: { $gt: appointment.startTime, $lte: appointment.endTime } }
+                ]
+            });
+
+            if (overlappingAppointment) {
+                return res.status(409).json({ message: 'An overlapping appointment already exists' });
+            }
+        }
+
+        const createdAppointments = await Appointment.insertMany(appointmentsWithUserId);
+
+        // Handle partner sharing and notifications
+        const user = await User.findById(req.userId) as IUser | null;
+        if (user && user.partner) {
+            const partner = await User.findById(user.partner) as IUser | null;
+            if (partner) {
+                // Update appointments to be shared with partner
+                await Appointment.updateMany(
+                    { _id: { $in: createdAppointments.map(app => app._id) } },
+                    { $addToSet: { sharedWith: partner._id } }
+                );
+
+                // Send notification to partner
+                await sendEmail('gmail', partner.email, 'Nieuwe herhalende afspraken', `Er zijn nieuwe herhalende afspraken gemaakt door ${user.email}`);
+            }
+        }
+
+        // Schedule reminders for each appointment
+        createdAppointments.forEach(appointment => scheduleReminders(appointment));
+
+        res.status(201).json(createdAppointments);
+    } catch (error: any) {
+        console.error('Error creating appointments:', error);
+        res.status(500).json({ message: 'Error creating appointments', error: error.message });
+    }
+};

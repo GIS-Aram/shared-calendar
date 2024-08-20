@@ -17,6 +17,7 @@ import {TaskService} from "../../services/task.service";
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {TranslateModule} from "@ngx-translate/core";
+import {animate, style, transition, trigger} from "@angular/animations";
 
 @Component({
   selector: 'app-appointment-detail',
@@ -24,6 +25,17 @@ import {TranslateModule} from "@ngx-translate/core";
   imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule,
     MatDividerModule, MatChip, MatList, MatListItem, MatChipListbox,
     MatChipsModule, MatLine, TranslateModule
+  ],
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('600ms ease-in', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('600ms ease-out', style({ opacity: 0 }))
+      ])
+    ])
   ],
   template: `
 <!--    <div class="container">-->
@@ -87,7 +99,7 @@ import {TranslateModule} from "@ngx-translate/core";
 
       <mat-divider></mat-divider>
 
-      <h3>Reminders</h3>
+      <h3>{{'REMINDERS' | translate}}</h3>
       <ng-container *ngIf="appointment.reminders && appointment.reminders.length > 0; else noReminders">
         <mat-chip-listbox>
           <mat-chip *ngFor="let reminder of appointment.reminders">
@@ -96,11 +108,12 @@ import {TranslateModule} from "@ngx-translate/core";
         </mat-chip-listbox>
       </ng-container>
       <ng-template #noReminders>
-        <p>{{ 'NO_REMINDERS' | translate }}</p>
+<!--        <p>{{ 'NO_REMINDERS' | translate }}</p>-->
+        <div class="no-reminders" @fadeInOut>{{ 'NO_REMINDERS' | translate }}</div>
       </ng-template>
       <mat-divider></mat-divider>
 
-      <h3>Assigned Tasks</h3>
+      <h3>{{'ASSIGNED_TASKS' | translate}}</h3>
       <ng-container *ngIf="appointment.taskIds && appointment.taskIds.length > 0; else noTasks">
         <mat-list>
           <mat-list-item *ngFor="let taskId of appointment.taskIds">
@@ -110,22 +123,23 @@ import {TranslateModule} from "@ngx-translate/core";
         </mat-list>
       </ng-container>
       <ng-template #noTasks>
-        <p>{{ 'NO_TASKS' | translate }}</p>
+<!--        <p>{{ 'NO_TASKS' | translate }}</p>-->
+        <div class="no-reminders" @fadeInOut>{{ 'NO_TASKS' | translate }}</div>
       </ng-template>
       <mat-divider></mat-divider>
 
 
       <div class="info-row" *ngIf="creatorName">
         <mat-icon>person</mat-icon>
-        <span>Created by: {{creatorName}}</span>
+        <span>{{'CREATED_BY' | translate}} {{creatorName}}</span>
       </div>
     </mat-card-content>
     <mat-card-actions>
       <button mat-raised-button color="primary" class="me-3" (click)="editAppointment(appointment._id)">
-        <mat-icon>edit</mat-icon> Edit
+        <mat-icon>edit</mat-icon> {{'EDIT' | translate}}
       </button>
       <button mat-raised-button color="warn" (click)="deleteAppointment(appointment._id)">
-        <mat-icon>delete</mat-icon> Delete
+        <mat-icon>delete</mat-icon> {{'DELETE' | translate}}
       </button>
     </mat-card-actions>
   </mat-card>

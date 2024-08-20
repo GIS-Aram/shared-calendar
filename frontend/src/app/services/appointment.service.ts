@@ -69,4 +69,8 @@ export class AppointmentService {
     // In een echte applicatie zou dit uit de authenticatieservice komen
     return 'currentUserId';
   }
+
+  createAppointments(appointments: any[]): Observable<any[]> {
+    return this.http.post<any[]>(`${this.apiUrl}/bulk`, appointments);
+  }
 }
